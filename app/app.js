@@ -15,6 +15,58 @@ app.get("/", function(req, res) {
     res.send("Hello world!");
 });
 
+app.get("/listings", async (req, res) => {
+  try {
+    console.log("Fetching listings...");
+    const listings = await db.query("SELECT * FROM listings LIMIT 1");
+    console.log("Listings fetched:", listings);
+
+    if (!listings.length) {
+      console.log("No listings found");
+      return res.status(404).json({ error: "No listings found" });
+    }
+
+    const listing = listings[0];
+    console.log("Fetching photos for listing id:", listing.id);
+
+    const photos = await db.query(
+      "SELECT photo_url FROM listing_photos WHERE listing_id = ?",
+      [listing.listing_id]
+    );
+    console.log("Photos fetched:", photos);
+
+    listing.photos = photos.map(p => p.photo_url);
+    res.json(listing);
+
+  } catch (error) {
+    console.error("Error fetching listing:", error);
+    res.status(500).json({ error: "Could not fetch listing" });
+  }
+});
+
+
+// app.get("/listings", async (req, res) => {
+//   try {
+//     // Get 1 listing (update the table name if needed)
+//     const listings = await db.query("SELECT * FROM listings LIMIT 1");
+//     const listing = listings[0];
+
+//     // Get photos for this listing
+//     const photos = await db.query(
+//       "SELECT photo_url FROM listing_photos WHERE listing_id = ?",
+//       [listing.id]
+//     );
+
+//     // Add photos to the listing
+//     listing.photos = photos.map(p => p.photo_url);
+
+//     res.json(listing);
+//   } catch (error) {
+//     console.error("Error fetching listing:", error);
+//     res.status(500).json({ error: "Could not fetch listing" });
+//   }
+// });
+
 // Create a route for testing the db
 app.get("/db_test", async (req, res) => {
   try {
