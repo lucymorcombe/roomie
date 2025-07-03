@@ -17,7 +17,7 @@ function App() {
             <Link to="/">
                 <img src={logo} alt="'Roomie' written in pink"/>
             </Link>
-            <ul>
+            <ul className='navBarUl'>
               <Link to="/about-us">
                 <li>About Us</li>
               </Link>

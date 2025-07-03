@@ -1,8 +1,13 @@
 // Import express.js
 const express = require("express");
 
+const path = require('path');
+
 // Create express app
 var app = express();
+
+
+app.use('/images', express.static(path.join(process.cwd(), 'app/public/images')));
 
 // Add static files location
 app.use(express.static("static"));
