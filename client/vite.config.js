@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/db_test': 'http://localhost:3000'
+      '/db_test': 'http://localhost:3000',
+      '/listings': 'http://localhost:3000'
     }
   }
 });

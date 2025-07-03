@@ -1,4 +1,4 @@
-function RoomListing(props) {
+function RoomListingCard(props) {
     return (
         <>
             <div className="photos">
@@ -24,3 +24,5 @@ function RoomListing(props) {
         </>
     )
 }
+
+export default RoomListingCard
