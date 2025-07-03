@@ -36,7 +36,7 @@ app.get("/listings", async (req, res) => {
     console.log("Photos fetched:", photos);
 
     listing.photos = photos.map(p => p.photo_url);
-    res.json(listing);
+    res.json([listing]);
 
   } catch (error) {
     console.error("Error fetching listing:", error);
