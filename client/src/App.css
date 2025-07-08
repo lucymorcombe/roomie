@@ -86,8 +86,9 @@ li.listing {
   grid-template-columns: 2fr 1fr; /* big image 2fr, right column 1fr */
   grid-template-rows: 1fr 1fr;    /* two rows, each same height */
   gap: 8px;
-  max-width: 800px; /* or your preferred width */
-  height: 400px; /* fix container height to control squares */
+  max-width: 100%; /* or your preferred width */
+  margin: 0 auto;
+  height: auto; /* fix container height to control squares */
 }
 
 .photo-0 {
@@ -121,4 +122,82 @@ li.listing {
 .photos img:nth-child(n+4) {
   display: none; /* or style as you want */
 }
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 90vh;  /* limit height to 90% of viewport */
+  width: 90vw;       /* or whatever width you want */
+  background: white;
+  overflow-y: auto;  /* enable vertical scrolling if content is too tall */
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left:0;
+  right:0;
+  bottom:0;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.carouselModalContainer {
+  width: 50vw;
+  height: 60vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: visible; /* important: allow arrows to appear outside if needed */
+}
+
+.carouselSlide {
+  width: 100%;
+  height: 100%;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; 
+}
+
+
+.carouselSlide img {
+  max-width: 100%;
+  max-height: 60vh;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: auto;
+}
+
+.carouselModalContainer .slick-slider,
+.carouselModalContainer .slick-list,
+.carouselModalContainer .slick-track {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+
+.closeModalButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
 
