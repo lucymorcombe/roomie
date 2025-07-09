@@ -18,6 +18,9 @@ function formatAgeRange(min, max) {
 function RoomListingCard(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  console.log("Photos received:", props.photos);
+  console.log("Photos array for listing:", props.photos);
+  console.log("RoomListingCard props.photos:", props.photos);
 
   const openModal = (index) => {
     setCurrentIndex(index);
@@ -31,7 +34,7 @@ function RoomListingCard(props) {
   return (
     <div className="listingCard">
       <div className="photos">
-        {props.photos.map((url, i) => (
+        {(props.photos || []).map((url, i) => (
           <img
             key={i}
             src={`http://localhost:3000/images/${url}`}
@@ -82,7 +85,7 @@ function RoomListingCard(props) {
             </button>
 
             <Slider initialSlide={currentIndex} dots={true} infinite={true} arrows={true}>
-              {props.photos.map((url, i) => (
+              {(props.photos || []).map((url, i) => (
                 <div key={i} className="carouselSlide">
                   <img
                     src={`http://localhost:3000/images/${url}`}

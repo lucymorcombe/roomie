@@ -215,6 +215,7 @@ li.listing {
   position: fixed;
   right: 15vw;
   bottom: 20px;
+  cursor: pointer;
 }
 
 .likeButton p {
@@ -235,6 +236,7 @@ li.listing {
   left: 15vw;
   margin-left: 60px;
   bottom: 20px;
+  cursor: pointer;
 }
 
 .dislikeButton p {

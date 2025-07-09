@@ -23,7 +23,7 @@ app.get("/", function(req, res) {
 app.get("/listings", async (req, res) => {
   try {
     console.log("Fetching roomListings...");
-    const listings = await db.query("SELECT * FROM roomListings LIMIT 1");
+    const listings = await db.query("SELECT * FROM roomListings");
     console.log("RoomListings fetched:", listings);
 
     if (!listings.length) {
@@ -31,17 +31,17 @@ app.get("/listings", async (req, res) => {
       return res.status(404).json({ error: "No listings found" });
     }
 
-    const listing = listings[0];
-    console.log("Fetching photos for room_id:", listing.room_id);
+    for (const listing of listings) {
+      console.log("Listing ID for photos query:", listing.room_id);
+      const photos = await db.query(
+        "SELECT photo_url FROM listing_photos WHERE room_id = ?",
+        [listing.room_id]
+      );
+      listing.photos = photos.map(p => p.photo_url);
+      console.log("Mapped photo URLs:", listing.photos);
+    }
 
-    const photos = await db.query(
-      "SELECT photo_url FROM listing_photos WHERE room_id = ?",
-      [listing.room_id]
-    );
-    console.log("Photos fetched:", photos);
-
-    listing.photos = photos.map(p => p.photo_url);
-    res.json([listing]);
+    res.json(listings);
 
   } catch (error) {
     console.error("Error fetching listing:", error);

@@ -1,7 +1,7 @@
-function DislikeButton() {
+function DislikeButton({onClick}) {
     return (
         <>
-        <div className="dislikeButton">
+        <div className="dislikeButton" onClick={onClick} >
             <p>{String.fromCharCode(215)}</p>
         </div>
         </>
@@ -9,3 +9,4 @@ function DislikeButton() {
 }
 
 export default DislikeButton
+
