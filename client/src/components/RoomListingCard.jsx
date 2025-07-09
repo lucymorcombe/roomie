@@ -31,19 +31,16 @@ function RoomListingCard(props) {
   return (
     <div className="listingCard">
       <div className="photos">
-        {props.photos.map((url, i) => {
-          const imgElement = (
-            <img
-              key={i}
-              src={`http://localhost:3000/images/${url}`}
-              alt={`Photo ${i + 1}`}
-              className={`photo photo-${i}`}
-              style={i === 2 ? { cursor: 'pointer' } : {}}
-              onClick={i === 2 ? () => openModal(i) : undefined}
-            />
-          );
-          return imgElement;
-        })}
+        {props.photos.map((url, i) => (
+          <img
+            key={i}
+            src={`http://localhost:3000/images/${url}`}
+            alt={`Photo ${i + 1}`}
+            className={`photo photo-${i}`}
+            style={i === 2 ? { cursor: 'pointer' } : {}}
+            onClick={i === 2 ? () => openModal(i) : undefined}
+          />
+        ))}
       </div>
 
       <div className="rent">
@@ -52,11 +49,21 @@ function RoomListingCard(props) {
 
       <div className="furtherInfo">
         <ul className="listingUl">
-          <li className="listing"><strong>Move in date:</strong> {formatDate(props.move_in_date_min)} - {formatDate(props.move_in_date_max)}</li>
-          <li className="listing"><strong>Location: </strong>{props.location}</li>
-          <li className="listing"><strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}</li>
-          <li className="listing"><strong>Women only household: </strong>{props.women_only_household === 1 ? 'Yes' : 'No'}</li>
-          <li className="listing"><strong>LGBTQ+ only household:</strong> {props.lgbtq_only_household === 1 ? 'Yes' : 'No'}</li>
+          <li className="listing">
+            <strong>Move in date:</strong> {formatDate(props.move_in_date_min)} - {formatDate(props.move_in_date_max)}
+          </li>
+          <li className="listing">
+            <strong>Location:</strong> {props.location}
+          </li>
+          <li className="listing">
+            <strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
+          </li>
+          <li className="listing">
+            <strong>Women only household:</strong> {props.women_only_household === 1 ? 'Yes' : 'No'}
+          </li>
+          <li className="listing">
+            <strong>LGBTQ+ only household:</strong> {props.lgbtq_only_household === 1 ? 'Yes' : 'No'}
+          </li>
         </ul>
       </div>
 
@@ -87,7 +94,9 @@ function RoomListingCard(props) {
           </div>
         </div>
       )}
+      
     </div>
+    
   );
 }
 

@@ -22,21 +22,21 @@ app.get("/", function(req, res) {
 
 app.get("/listings", async (req, res) => {
   try {
-    console.log("Fetching listings...");
-    const listings = await db.query("SELECT * FROM listings LIMIT 1");
-    console.log("Listings fetched:", listings);
+    console.log("Fetching roomListings...");
+    const listings = await db.query("SELECT * FROM roomListings LIMIT 1");
+    console.log("RoomListings fetched:", listings);
 
     if (!listings.length) {
-      console.log("No listings found");
+      console.log("No roomListings found");
       return res.status(404).json({ error: "No listings found" });
     }
 
     const listing = listings[0];
-    console.log("Fetching photos for listing id:", listing.id);
+    console.log("Fetching photos for room_id:", listing.room_id);
 
     const photos = await db.query(
-      "SELECT photo_url FROM listing_photos WHERE listing_id = ?",
-      [listing.listing_id]
+      "SELECT photo_url FROM listing_photos WHERE room_id = ?",
+      [listing.room_id]
     );
     console.log("Photos fetched:", photos);
 
@@ -50,22 +50,30 @@ app.get("/listings", async (req, res) => {
 });
 
 
+
 // app.get("/listings", async (req, res) => {
 //   try {
-//     // Get 1 listing (update the table name if needed)
+//     console.log("Fetching listings...");
 //     const listings = await db.query("SELECT * FROM listings LIMIT 1");
-//     const listing = listings[0];
+//     console.log("Listings fetched:", listings);
 
-//     // Get photos for this listing
+//     if (!listings.length) {
+//       console.log("No listings found");
+//       return res.status(404).json({ error: "No listings found" });
+//     }
+
+//     const listing = listings[0];
+//     console.log("Fetching photos for listing id:", listing.id);
+
 //     const photos = await db.query(
 //       "SELECT photo_url FROM listing_photos WHERE listing_id = ?",
-//       [listing.id]
+//       [listing.listing_id]
 //     );
+//     console.log("Photos fetched:", photos);
 
-//     // Add photos to the listing
 //     listing.photos = photos.map(p => p.photo_url);
+//     res.json([listing]);
 
-//     res.json(listing);
 //   } catch (error) {
 //     console.error("Error fetching listing:", error);
 //     res.status(500).json({ error: "Could not fetch listing" });

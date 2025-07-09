@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RoomListingCard from "./RoomListingCard";
+import LikeButton from "./LikeButton";
+import DislikeButton from "./DislikeButton";
 
 function RoomListingsContainer() {
     const [listings, setListings] = React.useState([]);
@@ -32,8 +34,11 @@ function RoomListingsContainer() {
         <>
         <div>
             {listings.map(listing => (
-                <RoomListingCard key={listing.listing_id} {...listing} />
+                <RoomListingCard key={listing.room_id} {...listing} />
             ))}
+            <DislikeButton/>
+            <LikeButton/>
+            <p className="helpSheet"><a>How does this work?</a></p>
         </div>
         </>
     )
