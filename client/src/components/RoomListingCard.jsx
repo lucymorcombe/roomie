@@ -47,7 +47,11 @@ function RoomListingCard(props) {
       </div>
 
       <div className="rent">
-        <h3>£{props.rent} pcm</h3>
+        {props.listingType === "hasRoom" ? (
+          <h3>£{props.rent} pcm</h3>
+        ) : (
+          <h3>£{props.budget_min} - £{props.budget_max} pcm</h3>
+        )}
       </div>
 
       <div className="furtherInfo">
@@ -58,9 +62,18 @@ function RoomListingCard(props) {
           <li className="listing">
             <strong>Location:</strong> {props.location}
           </li>
-          <li className="listing">
-            <strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
-          </li>
+
+          {props.listingType === "hasRoom" ? (
+            <li className="listing">
+              <strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
+            </li>
+          ) : (
+            <li className="listing">
+              <strong>Preferred age range:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
+            </li>
+          )}
+
+          
           <li className="listing">
             <strong>Women only household:</strong> {props.women_only_household === 1 ? 'Yes' : 'No'}
           </li>

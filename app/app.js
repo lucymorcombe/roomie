@@ -17,7 +17,7 @@ app.use(express.json());
 // Get the functions in the db.js file to use
 const db = require('./services/db');
 
-
+const SIMULATED_USER_ID = 1;
 
 // Create a route for root - /
 app.get("/", function(req, res) {
@@ -25,7 +25,7 @@ app.get("/", function(req, res) {
 });
 
 app.get("/api/room-listings", async (req, res) => {
-    const SIMULATED_USER_ID = 11;
+    
     try {
         const listings = await db.query(
             `
@@ -63,7 +63,6 @@ app.get("/api/room-listings", async (req, res) => {
 });
 
 app.get("/api/flatmate-listings", async (req, res) => {
-    const SIMULATED_USER_ID = 1;
     try {
         const listings = await db.query(
             `
@@ -98,6 +97,26 @@ app.get("/api/flatmate-listings", async (req, res) => {
         console.error("Error fetching listing:", error);
         res.status(500).json({ error: "Could not fetch listing" });
     }
+});
+
+app.get('/api/users/:id/listing-type', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const roomListing = await db.query(
+      'SELECT 1 FROM roomListings WHERE user_id = ? LIMIT 1',
+      [userId]
+    );
+
+    if (roomListing.length > 0) {
+      res.json({ listingType: 'hasRoom' });
+    } else {
+      res.json({ listingType: 'needsRoom' }); 
+    }
+  } catch (error) {
+    console.error('Error determining listing type:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 
@@ -175,8 +194,8 @@ app.post('/api/like', async (req, res) => {
     }
 });
 
+
 app.get('/api/likes', async (req, res) => {
-  const SIMULATED_USER_ID = 11;
   try {
     console.log('Getting likes for user', SIMULATED_USER_ID);
     const likes = await db.query(
@@ -211,7 +230,6 @@ app.get('/api/likes', async (req, res) => {
 
 
 app.get('/api/matches', async (req, res) => {
-  const SIMULATED_USER_ID = 11; // Or get from auth/session
   
   try {
   const matches = await db.query(

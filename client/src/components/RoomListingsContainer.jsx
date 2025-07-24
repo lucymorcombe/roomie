@@ -6,45 +6,43 @@ import DislikeButton from "./DislikeButton";
 function RoomListingsContainer() {
     const [listings, setListings] = React.useState([]);
     const [currentIndex, setCurrentIndex] = useState(0); //state for current index
-    const fakeUserId = 11;
+    const fakeUserId = 1;
 
 
     React.useEffect(() => {
-        console.log("Fetching listings...");
-        fetch("/api/room-listings")
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
+        const fetchListings = async () => {
+            try{
+                const listingTypeResponse = await fetch(`/api/users/${fakeUserId}/listing-type`);
+                const {listingType} = await listingTypeResponse.json();
+
+                let listingUrl = '';
+                if (listingType === 'hasRoom') {
+                    listingUrl = '/api/flatmate-listings';
+                } else if (listingType === 'needsRoom') {
+                    listingUrl = '/api/room-listings';
+                } else {
+                    throw new Error('Unknown listing type');
                 }
-                const contentType = res.headers.get("content-type") || "";
-                if (!contentType.includes("application/json")) {
-                    throw new Error(`Expected JSON but got ${contentType}`);
+
+                const listingsResponse = await fetch(listingUrl);
+                if (!listingsResponse.ok) {
+                    throw new Error(`HTTP error! status: ${listingsResponse.status}`);
                 }
-                return res.json();
-            })
-            .then(data => {
-                console.log("Listings fetched:", data);
-                setListings(data);
-            })
-            .catch(err => {
-                console.error("Error fetching listings:", err);
-            });
-    }, []);
+                const listingsData = await listingsResponse.json();
+                console.log("Listings fetched:", listingsData);
+                setListings(listingsData);
+                
+            } catch (error) {
+                console.error("Error fetching Roomie Picks:", error)
+            }
 
-    console.log("Current listings state:", listings);
+            };
 
-    // function handleYes() {
-    //     console.log("Liked listing:", listings[currentIndex]);
-    //     // TODO: send like info to server if needed
-    //     setCurrentIndex(i => (i + 1 < listings.length ? i + 1 : i));
-    // }
+            fetchListings();
+        }, []);
 
-    // function handleNo() {
-    //     console.log("Disliked listing:", listings[currentIndex]);
-    //     // TODO: send dislike info to server if needed
-    //     setCurrentIndex(i => (i + 1 < listings.length ? i + 1 : i));
-    // }
 
+///////this is my previous stuff from before. above is mya ttempt to fix.  im just not sure how to merge them
     function handleYes() {
         const currentListing = listings[currentIndex];
         console.log("Liked listing:", currentListing);
