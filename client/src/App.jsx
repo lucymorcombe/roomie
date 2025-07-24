@@ -7,6 +7,7 @@ import AboutUs from './pages/AboutUs';
 import RoomiePicks from './pages/RoomiePicks';
 import Matches from './pages/Matches';
 import Profile from './pages/Profile';
+import Likes from './pages/Likes';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
               <Link to="/roomie-picks">
                 <li>Roomie Picks</li>
               </Link>
+              <Link to="/likes">
+                <li>Likes</li>
+              </Link>
               <Link to="/matches">
                 <li>Matches</li>
               </Link>
@@ -37,6 +41,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/roomie-picks" element={<RoomiePicks />} />
+          <Route path="/likes" element={<Likes />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>

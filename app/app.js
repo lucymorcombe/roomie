@@ -24,42 +24,43 @@ app.get("/", function(req, res) {
     res.send("Hello world!");
 });
 
-app.get("/listings", async (req, res) => {
-  try {
-    const listings = await db.query(//("SELECT * FROM roomListings");
-      `
-      SELECT * FROM roomListings
-      WHERE user_id != ? 
-      AND user_id NOT IN (
-        SELECT liked_id FROM user_likes
-        WHERE liker_id = ?
-      )
-      `,
-      [SIMULATED_USER_ID, SIMULATED_USER_ID]
-    );
+app.get("/api/listings", async (req, res) => {
+    try {
+        const listings = await db.query(
+            `
+            SELECT * FROM roomListings
+            WHERE user_id != ? 
+            AND user_id NOT IN (
+                SELECT liked_id FROM user_likes
+                WHERE liker_id = ?
+            )
+            `,
+            [SIMULATED_USER_ID, SIMULATED_USER_ID]
+        );
 
-    if (!listings.length) {
-      console.log("No roomListings found");
-      return res.json([]);
+        if (!listings.length) {
+            console.log("No roomListings found");
+            return res.json([]);
+        }
+
+        for (const listing of listings) {
+            console.log("Listing ID for photos query:", listing.room_id);
+            const photos = await db.query(
+                "SELECT photo_url FROM listing_photos WHERE room_id = ?",
+                [listing.room_id]
+            );
+            listing.photos = photos.map(p => p.photo_url);
+            console.log("Mapped photo URLs:", listing.photos);
+        }
+
+        res.json(listings);
+
+    } catch (error) {
+        console.error("Error fetching listing:", error);
+        res.status(500).json({ error: "Could not fetch listing" });
     }
-
-    for (const listing of listings) {
-      console.log("Listing ID for photos query:", listing.room_id);
-      const photos = await db.query(
-        "SELECT photo_url FROM listing_photos WHERE room_id = ?",
-        [listing.room_id]
-      );
-      listing.photos = photos.map(p => p.photo_url);
-      console.log("Mapped photo URLs:", listing.photos);
-    }
-
-    res.json(listings);
-
-  } catch (error) {
-    console.error("Error fetching listing:", error);
-    res.status(500).json({ error: "Could not fetch listing" });
-  }
 });
+
 
 app.post('/api/like', async (req, res) => {
 
@@ -134,6 +135,41 @@ app.post('/api/like', async (req, res) => {
       return res.status(500).json({ error: 'Could not record like or match' });
     }
 });
+
+app.get('/api/likes', async (req, res) => {
+  const SIMULATED_USER_ID = 11;
+  try {
+    console.log('Getting likes for user', SIMULATED_USER_ID);
+    const likes = await db.query(
+      `SELECT
+        roomListings.*,
+        users.first_name,
+        listing_photos.photo_url AS first_photo,
+        user_likes.created_at
+      FROM user_likes
+      JOIN users 
+        ON users.user_id = user_likes.liker_id
+      JOIN roomListings 
+        ON roomListings.user_id = users.user_id
+      LEFT JOIN (
+        SELECT room_id, MIN(photo_url) AS photo_url
+        FROM listing_photos
+        WHERE photo_url LIKE '%bedroom%'
+        GROUP BY room_id
+      ) AS listing_photos 
+        ON listing_photos.room_id = roomListings.room_id
+      WHERE user_likes.liked_id = ?`,
+      [SIMULATED_USER_ID]
+    );
+    console.log('Likes query result:', likes);
+
+    res.json(likes);
+    } catch (error) {
+      console.error("Error fetching likes:", error);
+      res.status(500).json({ error: "Could not fetch likes" });
+    }
+  });
+
 
 app.get('/api/matches', async (req, res) => {
   const SIMULATED_USER_ID = 11; // Or get from auth/session

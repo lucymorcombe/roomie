@@ -11,7 +11,7 @@ function RoomListingsContainer() {
 
     React.useEffect(() => {
         console.log("Fetching listings...");
-        fetch("/listings")
+        fetch("/api/listings")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
