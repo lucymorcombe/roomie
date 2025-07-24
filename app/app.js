@@ -17,14 +17,15 @@ app.use(express.json());
 // Get the functions in the db.js file to use
 const db = require('./services/db');
 
-const SIMULATED_USER_ID = 11;
+
 
 // Create a route for root - /
 app.get("/", function(req, res) {
     res.send("Hello world!");
 });
 
-app.get("/api/listings", async (req, res) => {
+app.get("/api/room-listings", async (req, res) => {
+    const SIMULATED_USER_ID = 11;
     try {
         const listings = await db.query(
             `
@@ -48,6 +49,44 @@ app.get("/api/listings", async (req, res) => {
             const photos = await db.query(
                 "SELECT photo_url FROM listing_photos WHERE room_id = ?",
                 [listing.room_id]
+            );
+            listing.photos = photos.map(p => p.photo_url);
+            console.log("Mapped photo URLs:", listing.photos);
+        }
+
+        res.json(listings);
+
+    } catch (error) {
+        console.error("Error fetching listing:", error);
+        res.status(500).json({ error: "Could not fetch listing" });
+    }
+});
+
+app.get("/api/flatmate-listings", async (req, res) => {
+    const SIMULATED_USER_ID = 1;
+    try {
+        const listings = await db.query(
+            `
+            SELECT * FROM flatmateListings
+            WHERE user_id != ? 
+            AND user_id NOT IN (
+                SELECT liked_id FROM user_likes
+                WHERE liker_id = ?
+            )
+            `,
+            [SIMULATED_USER_ID, SIMULATED_USER_ID]
+        );
+
+        if (!listings.length) {
+            console.log("No flatmateListings found");
+            return res.json([]);
+        }
+
+        for (const listing of listings) {
+            console.log("Listing ID for photos query:", listing.flatmate_id);
+            const photos = await db.query(
+                "SELECT photo_url FROM listing_photos WHERE flatmate_id = ?",
+                [listing.flatmate_id]
             );
             listing.photos = photos.map(p => p.photo_url);
             console.log("Mapped photo URLs:", listing.photos);
