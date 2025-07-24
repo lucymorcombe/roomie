@@ -7,6 +7,7 @@ export default defineConfig({
     proxy: {
       '/db_test': 'http://localhost:3000',
       '/listings': 'http://localhost:3000',
+      '/api': 'http://localhost:3000',
     }
   }
 });

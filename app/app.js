@@ -12,8 +12,12 @@ app.use('/images', express.static(path.join(process.cwd(), 'app/public/images'))
 // Add static files location
 app.use(express.static("static"));
 
+app.use(express.json());
+
 // Get the functions in the db.js file to use
 const db = require('./services/db');
+
+const SIMULATED_USER_ID = 11;
 
 // Create a route for root - /
 app.get("/", function(req, res) {
@@ -22,13 +26,21 @@ app.get("/", function(req, res) {
 
 app.get("/listings", async (req, res) => {
   try {
-    console.log("Fetching roomListings...");
-    const listings = await db.query("SELECT * FROM roomListings");
-    console.log("RoomListings fetched:", listings);
+    const listings = await db.query(//("SELECT * FROM roomListings");
+      `
+      SELECT * FROM roomListings
+      WHERE user_id != ? 
+      AND user_id NOT IN (
+        SELECT liked_id FROM user_likes
+        WHERE liker_id = ?
+      )
+      `,
+      [SIMULATED_USER_ID, SIMULATED_USER_ID]
+    );
 
     if (!listings.length) {
       console.log("No roomListings found");
-      return res.status(404).json({ error: "No listings found" });
+      return res.json([]);
     }
 
     for (const listing of listings) {
@@ -49,6 +61,113 @@ app.get("/listings", async (req, res) => {
   }
 });
 
+app.post('/api/like', async (req, res) => {
+
+  const { likerId, likedUserId, liked } = req.body;
+  if (!likerId || !likedUserId || typeof liked !== 'boolean') {
+    console.log('Bad request: missing or invalid data');
+    return res.status(400).json({ error: 'Missing or invalid data' });
+  }
+
+  try {
+    console.log(`Inserting/updating like: likerId=${likerId}, likedUserId=${likedUserId}, liked=${liked}`);
+    // Your DB query here
+    await db.query(
+      'INSERT INTO user_likes (liker_id, liked_id, liked, created_at) VALUES (?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE liked = ?',
+      [likerId, likedUserId, liked, liked]
+    );
+
+  let isMatch = false;
+
+  if (liked) {
+    console.log('Checking if reciprocal like exists...');
+    const [existing] = await db.query(
+      'SELECT liked FROM user_likes WHERE liker_id = ? AND liked_id = ? AND liked = TRUE',
+      [likedUserId, likerId]
+    );
+    console.log('Reciprocal like query result:', existing);
+
+    if (existing) {
+        isMatch = true;
+        console.log('Match found! Creating/updating user_matches...');
+
+        const user1_id = likerId < likedUserId ? likerId : likedUserId;
+        const user2_id = likerId < likedUserId ? likedUserId : likerId;
+
+        
+       const [rows] = await db.query(
+          `SELECT GREATEST(
+            (SELECT created_at FROM user_likes WHERE liker_id = ? AND liked_id = ?),
+            (SELECT created_at FROM user_likes WHERE liker_id = ? AND liked_id = ?)
+          ) AS max_created_at`,
+          [likerId, likedUserId, likedUserId, likerId]
+        );
+
+        console.log('max_created_at rows:', rows);
+
+        const max_created_at = rows[0]?.max_created_at ?? new Date();
+
+        console.log('Latest like timestamp:', max_created_at);
+
+        
+
+        await db.query(
+          `INSERT INTO user_matches (user1_id, user2_id, matched_at)
+           VALUES (?, ?, ?)
+           ON DUPLICATE KEY UPDATE matched_at = VALUES(matched_at)`,
+          [user1_id, user2_id, max_created_at]
+        );
+        console.log('user_matches updated/inserted');
+        } else {
+          console.log('No reciprocal like found yet.');
+        }
+      }
+    
+
+    return res.status(200).json({
+      message: 'Like recorded',
+      match: isMatch
+    });
+
+    } catch (error) {
+      console.error('Error saving like or match:', error);
+      return res.status(500).json({ error: 'Could not record like or match' });
+    }
+});
+
+app.get('/api/matches', async (req, res) => {
+  const SIMULATED_USER_ID = 11; // Or get from auth/session
+  
+  try {
+  const matches = await db.query(
+    `SELECT
+      roomListings.*,
+      users.first_name,
+      listing_photos.photo_url AS first_photo,
+      user_matches.matched_at
+    FROM user_matches
+    JOIN users 
+      ON (users.user_id = user_matches.user1_id OR users.user_id = user_matches.user2_id)
+      AND users.user_id != ?
+    JOIN roomListings 
+      ON roomListings.user_id = users.user_id
+    LEFT JOIN (
+      SELECT room_id, MIN(photo_url) AS photo_url
+      FROM listing_photos
+      WHERE photo_url LIKE '%bedroom%'
+      GROUP BY room_id
+    ) AS listing_photos 
+      ON listing_photos.room_id = roomListings.room_id
+    WHERE user_matches.user1_id = ? OR user_matches.user2_id = ?`,
+    [SIMULATED_USER_ID, SIMULATED_USER_ID, SIMULATED_USER_ID]
+  );
+
+    res.json(matches);
+    } catch (error) {
+    console.error("Error fetching matches:", error);
+    res.status(500).json({ error: "Could not fetch matches" });
+    }
+});
 
 
 // app.get("/listings", async (req, res) => {
