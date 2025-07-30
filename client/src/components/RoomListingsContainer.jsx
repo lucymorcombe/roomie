@@ -6,6 +6,7 @@ import DislikeButton from "./DislikeButton";
 function RoomListingsContainer() {
     const [listings, setListings] = React.useState([]);
     const [currentIndex, setCurrentIndex] = useState(0); //state for current index
+    const [listingType, setListingType] = useState(null);
     const fakeUserId = 1;
 
 
@@ -14,6 +15,8 @@ function RoomListingsContainer() {
             try{
                 const listingTypeResponse = await fetch(`/api/users/${fakeUserId}/listing-type`);
                 const {listingType} = await listingTypeResponse.json();
+
+                setListingType(listingType);
 
                 let listingUrl = '';
                 if (listingType === 'hasRoom') {
@@ -78,18 +81,19 @@ function RoomListingsContainer() {
 
 
 
-    if (listings.length === 0) {
-    return (
-        <div>
-        <p>No more listings available. Try again later!</p>
-        </div>
-    );
+    if (!listingType) {
+        return <p>Loading listings...</p>; 
     }
+
+    if (listings.length === 0) {
+        return <p>No more listings available. Try again later!</p>;
+    }
+
     
     return (
         <>
         <div>
-            <RoomListingCard {...listings[currentIndex]} />
+            <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
             <DislikeButton onClick={handleNo} />
             <LikeButton onClick={handleYes} />
             {/* {listings.map(listing => (

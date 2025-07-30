@@ -47,7 +47,7 @@ function RoomListingCard(props) {
       </div>
 
       <div className="rent">
-        {props.listingType === "hasRoom" ? (
+        {props.rent !== undefined ? (
           <h3>£{props.rent} pcm</h3>
         ) : (
           <h3>£{props.budget_min} - £{props.budget_max} pcm</h3>
@@ -63,7 +63,7 @@ function RoomListingCard(props) {
             <strong>Location:</strong> {props.location}
           </li>
 
-          {props.listingType === "hasRoom" ? (
+          {props.rent !== undefined ? (
             <li className="listing">
               <strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
             </li>
