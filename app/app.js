@@ -1,10 +1,13 @@
 // Import express.js
 const express = require("express");
-
 const path = require('path');
-
-// Create express app
+const cors = require('cors');
 var app = express();
+
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true                 
+}));
 
 app.use(express.urlencoded({ extended: true }))
 app.use('/images', express.static(path.join(process.cwd(), 'app/public/images')));
@@ -29,6 +32,7 @@ app.use(session({
     maxAge: 10 * 60 * 1000 
 }
 }));
+
 
 // const SIMULATED_USER_ID = 1;
 
@@ -456,7 +460,7 @@ app.post('/api/authenticate', async function (req, res) {
     req.session.loggedIn = true;
     req.session.email = email; 
 
-    res.json({ success: true, userId: user_id });
+    res.json({ success: true, userId: user_id, email: email });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ success: false, error: 'Server error during login' });

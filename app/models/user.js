@@ -71,16 +71,16 @@ class User {
 
             console.log("Authenticating user ID:", this.id);
 
-            var sql = "SELECT password FROM users WHERE user_id = ?";
+            var sql = "SELECT password_hash FROM users WHERE user_id = ?";
             const result = await db.query(sql, [this.id]);
 
             if (result.length === 0) {
                 return false;
             }
 
-            console.log("Stored hashed password:", result[0].password);
+            console.log("Stored hashed password:", result[0].password_hash);
 
-            const match = await bcrypt.compare(submitted, result[0].password);
+            const match = await bcrypt.compare(submitted, result[0].password_hash);
             console.log("Password match result:", match);
 
             return match;
