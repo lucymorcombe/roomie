@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {BrowserRouter, Routes, Route, Link} from "react-router-dom";
 import "./App.css";
 import logo from "./assets/roomieLogoShadow.jpg";
@@ -8,6 +8,9 @@ import RoomiePicks from './pages/RoomiePicks';
 import Matches from './pages/Matches';
 import Profile from './pages/Profile';
 import Likes from './pages/Likes';
+
+import ProtectedRoute from './components/ProtectedRoute';  // import ProtectedRoute
+import GetStarted from './pages/GetStarted';
 
 function App() {
   return (
@@ -34,16 +37,36 @@ function App() {
               <Link to="/profile">
                 <li>Profile</li>
               </Link>
+              <Link to="/get-started">
+                <li>Get Started</li>
+              </Link>
             </ul>
           </nav>
         </header>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/roomie-picks" element={<RoomiePicks />} />
-          <Route path="/likes" element={<Likes />} />
-          <Route path="/matches" element={<Matches />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/roomie-picks" element={
+            <ProtectedRoute>
+              <RoomiePicks />
+            </ProtectedRoute>
+          } />
+          <Route path="/likes" element={
+            <ProtectedRoute>
+              <Likes />
+            </ProtectedRoute>
+          } />
+          <Route path="/matches" element={
+            <ProtectedRoute>
+              <Matches />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/get-started" element={<GetStarted />} />
         </Routes>
       </BrowserRouter>
     </>
@@ -51,67 +74,3 @@ function App() {
 }
 
 export default App;
-
-// Below is what chatgpt gave me to test the set up, keeping for the json stuff
-// function App() {
-//   const [data, setData] = useState([]);
-
-//   useEffect(() => {
-//     fetch('/db_test')
-//       .then(response => response.json())
-//       .then(json => setData(json))
-//       .catch(err => console.error('Error fetching data:', err));
-//   }, []);
-
-//   return (
-//     <div>
-//       <h1>DB Test Data</h1>
-//       <ul>
-//         {data.map(item => (
-//           <li key={item.id}>{item.name}: {item.value}</li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-
-// The below is what comes up when you start a vite project, the react and vite images, just keeping in case i need it
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <div>
-//         <a href="https://vite.dev" target="_blank">
-//           <img src={viteLogo} className="logo" alt="Vite logo" />
-//         </a>
-//         <a href="https://react.dev" target="_blank">
-//           <img src={reactLogo} className="logo react" alt="React logo" />
-//         </a>
-//       </div>
-//       <h1>Vite + React</h1>
-//       <div className="card">
-//         <button onClick={() => setCount((count) => count + 1)}>
-//           count is {count}
-//         </button>
-//         <p>
-//           Edit <code>src/App.jsx</code> and save to test HMR
-//         </p>
-//       </div>
-//       <p className="read-the-docs">
-//         Click on the Vite and React logos to learn more
-//       </p>
-//     </>
-//   )
-// }
-
-// export default App
