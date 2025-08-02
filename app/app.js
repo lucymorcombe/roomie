@@ -6,7 +6,7 @@ const path = require('path');
 // Create express app
 var app = express();
 
-
+app.use(express.urlencoded({ extended: true }))
 app.use('/images', express.static(path.join(process.cwd(), 'app/public/images')));
 
 // Add static files location
@@ -17,15 +17,25 @@ app.use(express.json());
 // Get the functions in the db.js file to use
 const db = require('./services/db');
 
-const SIMULATED_USER_ID = 1;
+const { User } = require("./models/user");
 
-// Create a route for root - /
-app.get("/", function(req, res) {
-    res.send("Hello world!");
-});
+var session = require('express-session');
+app.use(session({
+  secret: 'secretkeysdfjsflyoifasd',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    secure: false,
+    maxAge: 10 * 60 * 1000 
+}
+}));
+
+// const SIMULATED_USER_ID = 1;
 
 app.get("/api/room-listings", async (req, res) => {
-    
+    const userId = req.session?.uid;
+    if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
     try {
         const listings = await db.query(
             `
@@ -36,7 +46,7 @@ app.get("/api/room-listings", async (req, res) => {
                 WHERE liker_id = ?
             )
             `,
-            [SIMULATED_USER_ID, SIMULATED_USER_ID]
+            [userId, userId]
         );
 
         if (!listings.length) {
@@ -63,6 +73,9 @@ app.get("/api/room-listings", async (req, res) => {
 });
 
 app.get("/api/flatmate-listings", async (req, res) => {
+    const userId = req.session?.uid;
+    if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
     try {
         const listings = await db.query(
             `
@@ -73,7 +86,7 @@ app.get("/api/flatmate-listings", async (req, res) => {
                 WHERE liker_id = ?
             )
             `,
-            [SIMULATED_USER_ID, SIMULATED_USER_ID]
+            [userId, userId]
         );
 
         if (!listings.length) {
@@ -100,7 +113,9 @@ app.get("/api/flatmate-listings", async (req, res) => {
 });
 
 app.get('/api/users/:id/listing-type', async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.session?.uid;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
 
   try {
     const roomListing = await db.query(
@@ -121,6 +136,9 @@ app.get('/api/users/:id/listing-type', async (req, res) => {
 
 
 app.post('/api/like', async (req, res) => {
+  const userId = req.session?.uid;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
 
   const { likerId, likedUserId, liked } = req.body;
   if (!likerId || !likedUserId || typeof liked !== 'boolean') {
@@ -196,8 +214,11 @@ app.post('/api/like', async (req, res) => {
 
 
 app.get('/api/likes', async (req, res) => {
+  const userId = req.session?.uid;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
   try {
-    console.log('Getting likes for user', SIMULATED_USER_ID);
+    console.log('Getting likes for user', userId);
     const likes = await db.query(
       `SELECT
         roomListings.*,
@@ -217,7 +238,7 @@ app.get('/api/likes', async (req, res) => {
       ) AS listing_photos 
         ON listing_photos.room_id = roomListings.room_id
       WHERE user_likes.liked_id = ?`,
-      [SIMULATED_USER_ID]
+      [userId]
     );
     console.log('Likes query result:', likes);
 
@@ -230,6 +251,9 @@ app.get('/api/likes', async (req, res) => {
 
 
 app.get('/api/matches', async (req, res) => {
+  const userId = req.session?.uid;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
     try {
         const matches = await db.query(
             `
@@ -285,8 +309,8 @@ app.get('/api/matches', async (req, res) => {
             WHERE user_matches.user1_id = ? OR user_matches.user2_id = ?
             `,
             [
-                SIMULATED_USER_ID, SIMULATED_USER_ID, SIMULATED_USER_ID,
-                SIMULATED_USER_ID, SIMULATED_USER_ID, SIMULATED_USER_ID
+                userId, userId, userId,
+                userId, userId, userId
             ]
         );
 
@@ -297,64 +321,142 @@ app.get('/api/matches', async (req, res) => {
     }
 });
 
+//Added routes to try and get login working:
 
-
-// app.get("/listings", async (req, res) => {
-//   try {
-//     console.log("Fetching listings...");
-//     const listings = await db.query("SELECT * FROM listings LIMIT 1");
-//     console.log("Listings fetched:", listings);
-
-//     if (!listings.length) {
-//       console.log("No listings found");
-//       return res.status(404).json({ error: "No listings found" });
-//     }
-
-//     const listing = listings[0];
-//     console.log("Fetching photos for listing id:", listing.id);
-
-//     const photos = await db.query(
-//       "SELECT photo_url FROM listing_photos WHERE listing_id = ?",
-//       [listing.listing_id]
-//     );
-//     console.log("Photos fetched:", photos);
-
-//     listing.photos = photos.map(p => p.photo_url);
-//     res.json([listing]);
-
-//   } catch (error) {
-//     console.error("Error fetching listing:", error);
-//     res.status(500).json({ error: "Could not fetch listing" });
-//   }
-// });
-
-// Create a route for testing the db
-app.get("/db_test", async (req, res) => {
-  try {
-    const results = await db.query("SELECT * FROM test_table");
-    res.json(results);
-  } catch (error) {
-    console.error("DB error:", error);
-    res.status(500).json({ error: "Database error" });
+app.get('/api/session', (req, res) => {
+  if (req.session?.uid) {
+    res.json({
+      loggedIn: true,
+      userId: req.session.uid,
+      displayName: req.session.display_name,
+      username: req.session.username,
+    });
+  } else {
+    res.json({ loggedIn: false });
   }
 });
 
-// Create a route for /goodbye
-// Responds to a 'GET' request
-app.get("/goodbye", function(req, res) {
-    res.send("Goodbye world!");
+app.get('/api/users/:id', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const sql = `
+      SELECT 
+        users.username, 
+        users.display_name, 
+        users.email, 
+        users.bio, 
+        users.users_id 
+      FROM users 
+      WHERE users.users_id = ?
+    `;
+
+    const results = await db.query(sql, [userId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = results[0];
+
+    res.json({
+      users_id: user.users_id,
+      username: user.username,
+      display_name: user.display_name,
+      email: user.email,
+      bio: user.bio
+    });
+
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Could not fetch user profile' });
+  }
 });
 
-// Create a dynamic route for /hello/<name>, where name is any value provided by user
-// At the end of the URL
-// Responds to a 'GET' request
-app.get("/hello/:name", function(req, res) {
-    // req.params contains any parameters in the request
-    // We can examine it in the console for debugging purposes
-    console.log(req.params);
-    //  Retrieve the 'name' parameter and use it in a dynamically generated page
-    res.send("Hello " + req.params.name);
+  
+app.post('/api/set-password', async function (req, res) {
+  const { email, password, username, display_name } = req.body;
+  const user = new User(email);
+
+  try {
+    let uId = await user.getIdFromEmail(password);
+
+    if (uId) {
+      // User exists — update password
+      await user.setUserPassword(password);
+    } else {
+      // Create new user
+      uId = await user.addUser(username, display_name, password);
+    }
+
+    // Log them in immediately
+    req.session.uid = uId;
+    req.session.loggedIn = true;
+
+    // Store username/display name in session
+    const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
+    const [userInfo] = await db.query(sql, [uId]);
+
+    if (userInfo) {
+      req.session.display_name = userInfo.display_name;
+      req.session.username = userInfo.username;
+    }
+
+    res.json({ success: true, userId: uId });
+  } catch (err) {
+    console.error('Error setting password:', err);
+    res.status(500).json({ success: false, error: 'Server error during registration' });
+  }
 });
+
+// Check submitted email and password pair
+app.post('/api/authenticate', async function (req, res) {
+  const { email, password } = req.body;
+  const user = new User(email);
+
+  try {
+    const uId = await user.getIdFromEmail(password);
+    if (!uId) {
+      return res.status(401).json({ success: false, error: 'Invalid email' });
+    }
+
+    const match = await user.authenticate(password);
+    if (!match) {
+      return res.status(401).json({ success: false, error: 'Invalid password' });
+    }
+
+    // Set session
+    req.session.uid = uId;
+    req.session.loggedIn = true;
+
+    // Store username and display name in session
+    const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
+    const [userInfo] = await db.query(sql, [uId]);
+
+    if (userInfo) {
+      req.session.display_name = userInfo.display_name;
+      req.session.username = userInfo.username;
+    }
+
+    res.json({ success: true, userId: uId });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ success: false, error: 'Server error during login' });
+  }
+});
+
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.status(500).json({ error: 'Could not log out' });
+    }
+
+    res.clearCookie('connect.sid'); // Optional: explicitly clear session cookie
+    res.json({ message: 'Logged out successfully' });
+  });
+});
+
 
 // Start server on port 3000
 app.listen(3000,function(){
