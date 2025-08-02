@@ -9,7 +9,7 @@ import Matches from './pages/Matches';
 import Profile from './pages/Profile';
 import Likes from './pages/Likes';
 
-import ProtectedRoute from './components/ProtectedRoute';  // import ProtectedRoute
+//import ProtectedRoute from './components/ProtectedRoute';  // import ProtectedRoute
 import GetStarted from './pages/GetStarted';
 
 function App() {
@@ -46,26 +46,10 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/roomie-picks" element={
-            <ProtectedRoute>
-              <RoomiePicks />
-            </ProtectedRoute>
-          } />
-          <Route path="/likes" element={
-            <ProtectedRoute>
-              <Likes />
-            </ProtectedRoute>
-          } />
-          <Route path="/matches" element={
-            <ProtectedRoute>
-              <Matches />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          } />
+          <Route path="/roomie-picks" element={<RoomiePicks />} />
+          <Route path="/likes" element={<Likes />} />
+          <Route path="/matches" element={<Matches />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/get-started" element={<GetStarted />} />
         </Routes>
       </BrowserRouter>

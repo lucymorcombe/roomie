@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSession } from './SessionContext';
 
 function LoginForm() {
+  console.log('useSession()', useSession());
+
   const { setSession } = useSession();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
