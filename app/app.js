@@ -33,7 +33,7 @@ app.use(session({
 // const SIMULATED_USER_ID = 1;
 
 app.get("/api/room-listings", async (req, res) => {
-    const userId = req.session?.uid;
+    const userId = req.session?.user_id;
     if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
     try {
@@ -73,7 +73,7 @@ app.get("/api/room-listings", async (req, res) => {
 });
 
 app.get("/api/flatmate-listings", async (req, res) => {
-    const userId = req.session?.uid;
+    const userId = req.session?.user_id;
     if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
     try {
@@ -113,7 +113,7 @@ app.get("/api/flatmate-listings", async (req, res) => {
 });
 
 app.get('/api/users/:id/listing-type', async (req, res) => {
-  const userId = req.session?.uid;
+  const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
 
@@ -136,7 +136,7 @@ app.get('/api/users/:id/listing-type', async (req, res) => {
 
 
 app.post('/api/like', async (req, res) => {
-  const userId = req.session?.uid;
+  const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
 
@@ -214,7 +214,7 @@ app.post('/api/like', async (req, res) => {
 
 
 app.get('/api/likes', async (req, res) => {
-  const userId = req.session?.uid;
+  const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
   try {
@@ -251,7 +251,7 @@ app.get('/api/likes', async (req, res) => {
 
 
 app.get('/api/matches', async (req, res) => {
-  const userId = req.session?.uid;
+  const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
     try {
@@ -324,12 +324,11 @@ app.get('/api/matches', async (req, res) => {
 //Added routes to try and get login working:
 
 app.get('/api/session', (req, res) => {
-  if (req.session?.uid) {
+  if (req.session?.user_id) {
     res.json({
       loggedIn: true,
-      userId: req.session.uid,
-      displayName: req.session.display_name,
-      username: req.session.username,
+      userId: req.session.user_id,
+      email: req.session.email,
     });
   } else {
     res.json({ loggedIn: false });
@@ -342,13 +341,13 @@ app.get('/api/users/:id', async (req, res) => {
   try {
     const sql = `
       SELECT 
-        users.username, 
-        users.display_name, 
+        users.first_name, 
+        users.last_name, 
         users.email, 
-        users.bio, 
-        users.users_id 
+        users.dob, 
+        users.user_id 
       FROM users 
-      WHERE users.users_id = ?
+      WHERE users.user_id = ?
     `;
 
     const results = await db.query(sql, [userId]);
@@ -360,11 +359,11 @@ app.get('/api/users/:id', async (req, res) => {
     const user = results[0];
 
     res.json({
-      users_id: user.users_id,
-      username: user.username,
-      display_name: user.display_name,
+      first_name: user.first_name,
+      last_name: user.last_name,
       email: user.email,
-      bio: user.bio
+      dob: user.dob,
+      user_id: user.user_id,
     });
 
   } catch (error) {
@@ -375,39 +374,66 @@ app.get('/api/users/:id', async (req, res) => {
 
   
 app.post('/api/set-password', async function (req, res) {
-  const { email, password, username, display_name } = req.body;
+  console.log("BODY:", req.body);
+  console.log("Incoming request body:", req.body); 
+
+  const { first_name, last_name, dob, email, password } = req.body;
+
+  // Log individual fields
+  console.log('Parsed fields:', {
+    first_name,
+    last_name,
+    dob,
+    email,
+    password,
+  });
+
+  // Quick check: are any required fields missing?
+  if (!first_name || !last_name || !dob || !email || !password) {
+    console.warn('Missing required fields');
+    return res.status(400).json({ success: false, error: 'Missing required fields' });
+  }
+
   const user = new User(email);
 
   try {
-    let uId = await user.getIdFromEmail(password);
+    let user_id = await user.getIdFromEmail();
 
-    if (uId) {
-      // User exists — update password
-      await user.setUserPassword(password);
+    if (user_id !== false) {
+      // User exists — reject registration attempt
+      return res.status(400).json({ success: false, error: 'Email already in use' });
     } else {
       // Create new user
-      uId = await user.addUser(username, display_name, password);
+      user_id = await user.addUser(first_name, last_name, dob, email, password);
     }
 
+
     // Log them in immediately
-    req.session.uid = uId;
+    req.session.user_id = user_id;
     req.session.loggedIn = true;
 
     // Store username/display name in session
-    const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
-    const [userInfo] = await db.query(sql, [uId]);
-
-    if (userInfo) {
-      req.session.display_name = userInfo.display_name;
-      req.session.username = userInfo.username;
+    const sql = "SELECT email FROM users WHERE user_id = ?";
+    const result = await db.query(sql, [user_id]);
+    console.log("User info query result:", result);
+    
+    if (Array.isArray(result) && result.length > 0) {
+      req.session.email = result[0].email;
     }
 
-    res.json({ success: true, userId: uId });
+    res.json({ success: true, userId: user_id });
   } catch (err) {
     console.error('Error setting password:', err);
+
+    // If the error is about undefined SQL params, call that out clearly
+    if (err.message.includes('Bind parameters must not contain undefined')) {
+      return res.status(500).json({ success: false, error: 'Internal error: invalid database values (undefined)' });
+    }
+
     res.status(500).json({ success: false, error: 'Server error during registration' });
   }
 });
+
 
 // Check submitted email and password pair
 app.post('/api/authenticate', async function (req, res) {
@@ -415,8 +441,8 @@ app.post('/api/authenticate', async function (req, res) {
   const user = new User(email);
 
   try {
-    const uId = await user.getIdFromEmail(password);
-    if (!uId) {
+    const user_id = await user.getIdFromEmail();
+    if (user_id === false) {
       return res.status(401).json({ success: false, error: 'Invalid email' });
     }
 
@@ -426,19 +452,11 @@ app.post('/api/authenticate', async function (req, res) {
     }
 
     // Set session
-    req.session.uid = uId;
+    req.session.user_id = user_id;
     req.session.loggedIn = true;
+    req.session.email = email; 
 
-    // Store username and display name in session
-    const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
-    const [userInfo] = await db.query(sql, [uId]);
-
-    if (userInfo) {
-      req.session.display_name = userInfo.display_name;
-      req.session.username = userInfo.username;
-    }
-
-    res.json({ success: true, userId: uId });
+    res.json({ success: true, userId: user_id });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ success: false, error: 'Server error during login' });

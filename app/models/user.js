@@ -9,15 +9,20 @@ class User {
         this.email = email;
     }
 
-    async getIdFromEmail(password) {
+    async getIdFromEmail() {
         try {
             console.log("Running getIdFromEmail for:", this.email);
-            var sql = "SELECT users_id FROM Users WHERE Users.email = ?";
+
+            if (!this.email) {
+                throw new Error("Email is undefined in getIdFromEmail");
+            }
+
+            var sql = "SELECT user_id FROM users WHERE email = ?";
             const result = await db.query(sql, [this.email]);
             console.log("DB result:", result);
 
             if (result.length > 0) {
-                this.id = result[0].users_id;
+                this.id = result[0].user_id;
                 return this.id;
             } else {
                 return false;
@@ -28,10 +33,11 @@ class User {
         }
     }
 
+
     async setUserPassword(password) {
         try {
             const pw = await bcrypt.hash(password, 10);
-            var sql = "UPDATE Users SET password = ? WHERE Users_id = ?";
+            var sql = "UPDATE users SET password_hash = ? WHERE user_id = ?";
             const result = await db.query(sql, [pw, this.id]);
             return true;
         } catch (err) {
@@ -40,13 +46,13 @@ class User {
         }
     }
 
-    async addUser(username, display_name, password) {
+    async addUser(first_name, last_name, dob, email, password) {
         try {
             const pw = await bcrypt.hash(password, 10);
-            var sql = "INSERT INTO Users (username, Display_name, email, password) VALUES (?, ?, ?, ?)";
-            const result = await db.query(sql, [username, display_name, this.email, pw]);
-            console.log(result.insertId);
-            this.id = result.insertId;
+            var sql = "INSERT INTO users (first_name, last_name, dob, email, password_hash) VALUES (?, ?, ?, ?, ?)";
+            const result = await db.query(sql, [first_name, last_name, dob, email, pw]);
+            console.log("db.query result in addUser:", result);
+            this.id = result.insertId; 
             return this.id;
         } catch (err) {
             console.error("Error in addUser:", err);
@@ -65,7 +71,7 @@ class User {
 
             console.log("Authenticating user ID:", this.id);
 
-            var sql = "SELECT password FROM Users WHERE users_id = ?";
+            var sql = "SELECT password FROM users WHERE user_id = ?";
             const result = await db.query(sql, [this.id]);
 
             if (result.length === 0) {
