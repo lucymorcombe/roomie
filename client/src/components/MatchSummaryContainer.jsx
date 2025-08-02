@@ -29,7 +29,7 @@ function MatchSummaryContainer() {
     return(
         <div className="matchSummaryContainer">
             {listings.map((listing) => (
-                <MatchSummaryCard key={listing.room_id} {...listing} />
+                <MatchSummaryCard key={listing.listing_id} {...listing} />
             ))}
         </div>
     )
