@@ -12,9 +12,10 @@ function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch('/authenticate', {
+    const res = await fetch('/api/authenticate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
@@ -29,8 +30,24 @@ function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <label>
+        Email address
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+      </label>
+      <label>
+        Password
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+      </label>
       <button type="submit">Log In</button>
     </form>
   );

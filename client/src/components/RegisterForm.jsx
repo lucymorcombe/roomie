@@ -6,16 +6,21 @@ function RegisterForm() {
   const { setSession } = useSession();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    email: '', password: '', username: '', display_name: ''
+    first_name: '',
+    last_name: '',
+    dob: '',
+    email: '',
+    password: ''
   });
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch('/set-password', {
+    const res = await fetch('/api/set-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(form)
     });
     const data = await res.json();
@@ -30,13 +35,63 @@ function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input name="email" placeholder="Email" onChange={handleChange} />
-      <input name="username" placeholder="Username" onChange={handleChange} />
-      <input name="display_name" placeholder="Display Name" onChange={handleChange} />
-      <input name="password" placeholder="Password" type="password" onChange={handleChange} />
+      <label>
+        First name
+        <input
+          name="first_name"
+          type="text"
+          placeholder="First name"
+          value={form.first_name}
+          onChange={handleChange}
+        />
+      </label>
+
+      <label>
+        Last name
+        <input
+          name="last_name"
+          type="text"
+          placeholder="Last name"
+          value={form.last_name}
+          onChange={handleChange}
+        />
+      </label>
+
+      <label>
+        Date of birth
+        <input
+          name="dob"
+          type="date"
+          value={form.dob}
+          onChange={handleChange}
+        />
+      </label>
+
+      <label>
+        Email address
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+        />
+      </label>
+
+      <label>
+        Password
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+        />
+      </label>
+
       <button type="submit">Register</button>
     </form>
   );
 }
 
-export default RegisterForm
+export default RegisterForm;
