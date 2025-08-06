@@ -11,6 +11,7 @@ import Matches from './pages/Matches';
 import Profile from './pages/Profile';
 import Likes from './pages/Likes';
 import GetStarted from './pages/GetStarted';
+import ProfileSetup from './pages/ProfileSetup';
 
 function App() {
   const { session, setSession } = useSession();
@@ -71,6 +72,7 @@ function App() {
         <Route path="/matches" element={<Matches />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/profile-setup" element={<ProfileSetup />} />
       </Routes>
     </BrowserRouter>
   );
