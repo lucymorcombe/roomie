@@ -2,7 +2,7 @@ import ProfileSetUpWizard from "../components/ProfileSetUpWizard"
 
 function ProfileSetup() {
     return(
-        <ProfileSetUpWizard/>
+                <ProfileSetUpWizard/>
     )
 }
 

@@ -16,6 +16,7 @@ function Step1ProfileInfo({ onNext, defaultValues }) {
 
       <label>
         About You:
+        <p>Just a little about yourself. Don’t worry, there will be more opportunities to share what you’re looking for in the next steps.</p>
         <textarea {...register('bio')} />
       </label>
 

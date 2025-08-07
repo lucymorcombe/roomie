@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 
-function Step4CreateListing({ listingType, onNext, defaultValues }) {
+function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues }) {
   const { register, handleSubmit } = useForm({ defaultValues });
 
   const onSubmit = (data) => {
@@ -44,7 +44,7 @@ function Step4CreateListing({ listingType, onNext, defaultValues }) {
           <>
             <label>When do you need to move?</label>
             <input type="date" placeholder="Earliest" {...register('move_in_min')} />
-            <input type="date" placeholder="Latest"{...register('move_in_max')} />
+            <input type="date" placeholder="Latest" {...register('move_in_max')} />
           </>
         )}
       </div>
@@ -59,8 +59,8 @@ function Step4CreateListing({ listingType, onNext, defaultValues }) {
         ) : (
           <>
             <label>How long do you want to stay? </label>
-            <input type="text" placeholder="Minimum"{...register('stay_length_min')} />
-            <input type="text" placeholder="Maximum"{...register('stay_length_max')} />
+            <input type="text" placeholder="Minimum" {...register('stay_length_min')} />
+            <input type="text" placeholder="Maximum" {...register('stay_length_max')} />
           </>
         )}
       </div>
@@ -90,8 +90,8 @@ function Step4CreateListing({ listingType, onNext, defaultValues }) {
         ) : (
           <>
             <label>How many flatmates do you want?</label>
-            <input type="number" placeholder="Minimum"{...register('flatmates_min')} />
-            <input type="number" placeholder="Maximum"{...register('flatmates_max')} />
+            <input type="number" placeholder="Minimum" {...register('flatmates_min')} />
+            <input type="number" placeholder="Maximum" {...register('flatmates_max')} />
           </>
         )}
       </div>
@@ -128,7 +128,13 @@ function Step4CreateListing({ listingType, onNext, defaultValues }) {
         )}
       </div>
 
-      <button type="submit">Next</button>
+      {/* Navigation Buttons */}
+      <div style={{ marginTop: '1rem' }}>
+        <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>
+          Previous
+        </button>
+        <button type="submit">Next</button>
+      </div>
     </form>
   );
 }

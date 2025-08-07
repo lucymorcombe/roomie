@@ -1,14 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap');
 
 /*  font-family: "Inter", sans-serif; */
 
-p {
+body {
   font-family: "Inter", sans-serif;
+}
+
+p {
   font-size: 16px;
 }
 
+h1 {
+  font-size: 36px;
+  color: #F25278;
+  text-shadow: 0px 0px 1px #000;
+}
+
 h3 {
-  font-family: "Inter", sans-serif;
   font-size: 26px;
   color: #F25278;
   font-weight: 800;
@@ -16,7 +25,6 @@ h3 {
 }
 
 h4 {
-  font-family: "Inter", sans-serif;
   font-size: 20px;
   color: #F25278;
   font-weight: 800;
@@ -41,13 +49,163 @@ ul.navBarUl {
 
 li {
   list-style-type: none;
-  font-family: "Inter", sans-serif;
   color: black;
   padding-right: 20px;
 }
 
 a {
   text-decoration: none;
+}
+
+/* Profile Setup Wizard */
+
+.profileSetupPage {
+  width: 60vw;
+  margin-left: 20vw;
+  margin-bottom: 0px;
+}
+
+.profileSetupPage h1 {
+  font-weight: 240;
+  width: fit-content;
+  border-bottom: 3px solid #F25278;
+}
+
+.profileSetupContainer {
+  background-color: #f5bbcc;
+  max-width: 60vw;
+  min-height: 50vh;
+  border-radius: 25px;
+  padding: 30px 70px;
+}
+
+.profileSetupContainer h4 {
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.profileSetupContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profileSetupContainer label {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 5px;
+}
+
+p.stepIntro {
+  font-size: 16px !important;
+}
+
+.hideNotice {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hideNotice p {
+  text-align: center;
+  align-self: flex-end;
+}
+
+.stepTwo form {
+  padding-right: 20px;
+  padding-top: 14px;
+}
+
+.profileSetupContainer label.horizontal {
+  display: flex;
+  flex-direction: row;
+}
+
+.profileSetupContainer label.textInput {
+  display: flex;
+  flex-direction: row;
+  grid-gap: 25px;
+}
+
+.horizontalField {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  row-gap: 5px;
+}
+
+.rightColumn {
+  width: 30px; /* or whatever works well visually */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.hideOption {
+  align-items: center;
+}
+
+.profileSetupContainer button {
+  align-self: flex-end;
+  background-color: #A94064;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.profileSetupContainer p {
+  font-size: 13px;
+  margin: 0px;
+}
+
+.stepTwo label {
+  justify-content: space-between;
+}
+
+.optionBoxContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10%;
+}
+
+.optionBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #ffffff;
+  width: 30%;
+  aspect-ratio: 1/1;
+  color: #F25278;
+  border-radius: 10px;
+}
+
+.optionBox p {
+  font-size: 14px;
+  padding: 0px 25px;
+  text-align: center;
+}
+
+.optionBox h3 {
+  margin-top: 0px;
+}
+
+img.homeIcon {
+  width: 55%;
+}
+
+img.roomIcon {
+  width: 55%;
 }
 
 /* roomie picks room listings */

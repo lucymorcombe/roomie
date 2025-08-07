@@ -1,4 +1,6 @@
 import React from 'react';
+import homeIcon from "../assets/homeIcon.jpg";
+import roomIcon from "../assets/roomIcon.jpg";
 
 function Step3RoomOrRoomie({ onNext, onPrevious, defaultValues }) {
   const handleSelect = (selection) => {
@@ -7,17 +9,18 @@ function Step3RoomOrRoomie({ onNext, onPrevious, defaultValues }) {
 
   return (
     <div>
-      <h2>Step 3: Choose your listing type</h2>
-      <p>Please select one of the following options:</p>
+      <div className='optionBoxContainer'>
+        <div className="optionBox" onClick={() => handleSelect('needsRoom')}>
+          <h3>A Room</h3>
+          <img className="homeIcon" src={homeIcon}/>
+          <p>I’m looking for a room in an existing house share.</p>
+        </div>
 
-      <div onClick={() => handleSelect('needsRoom')}>
-        <strong>A room</strong>
-        <p>I’m looking for a room in an existing house share</p>
-      </div>
-
-      <div onClick={() => handleSelect('hasRoom')}>
-        <strong>A roomie</strong>
-        <p>I’m looking for someone to fill an empty room in my home</p>
+        <div className="optionBox" onClick={() => handleSelect('hasRoom')}>
+          <h3>A Roomie</h3>
+          <img className="roomIcon" src={homeIcon}/>
+          <p>I’m looking for someone to fill an empty room in my home</p>
+        </div>
       </div>
 
       <div style={{ marginTop: '1rem' }}>
