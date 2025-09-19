@@ -1,17 +1,41 @@
 import { useForm } from 'react-hook-form';
 
-function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues }) {
+function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, userId }) {
   const { register, handleSubmit } = useForm({ defaultValues });
 
-  const onSubmit = (data) => {
-    onNext(data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch(`/api/listings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          listingType, // 'hasRoom' or 'needsRoom'
+          userId,
+          ...data
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save listing');
+      }
+
+      const result = await response.json();
+
+      // Continue to next step with saved listing info
+      onNext({ ...data, listingId: result.insertId });
+    } catch (err) {
+      console.error(err);
+      alert('Could not save your listing. Please try again.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <h2>Create your ad</h2>
 
-      {/* Upload photos: same for both */}
+      {/* Upload photos */}
       <div>
         <label>Upload photos (3-10)</label>
         <input type="file" accept="image/*" multiple {...register('photos')} />
@@ -26,7 +50,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues }) 
           </>
         ) : (
           <>
-            <label>What is your budget? </label>
+            <label>What is your budget?</label>
             <input type="number" placeholder="Minimum (£)" {...register('budget_min')} />
             <input type="number" placeholder="Maximum (£)" {...register('budget_max')} />
           </>
@@ -58,7 +82,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues }) 
           </>
         ) : (
           <>
-            <label>How long do you want to stay? </label>
+            <label>How long do you want to stay?</label>
             <input type="text" placeholder="Minimum" {...register('stay_length_min')} />
             <input type="text" placeholder="Maximum" {...register('stay_length_max')} />
           </>
@@ -112,6 +136,22 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues }) 
           </>
         )}
       </div>
+
+      <div>
+        {listingType === 'hasRoom' ? (
+          <>
+            <label>Is your home a women-only home?</label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
+            <label>Is your home a lgbtq+ only home?</label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>
+          </>
+        ) : 
+        (
+          <></>
+        )}
+          </div>
 
       {/* Description */}
       <div>

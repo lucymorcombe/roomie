@@ -1,6 +1,8 @@
 import { useForm } from 'react-hook-form';
 
 function Step1ProfileInfo({ onNext, defaultValues }) {
+  console.log("Step1 defaultValues:", defaultValues);
+
   const { register, handleSubmit } = useForm({ defaultValues });
 
   const onSubmit = (data) => {

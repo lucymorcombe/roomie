@@ -27,7 +27,7 @@ function RegisterForm() {
 
     if (data.success) {
       setSession({ ...data, loggedIn: true });
-      navigate(`/profile/${data.userId}`);
+      navigate(`/profile-setup`);
     } else {
       alert(data.error || 'Registration failed');
     }

@@ -10,16 +10,22 @@ function Step3RoomOrRoomie({ onNext, onPrevious, defaultValues }) {
   return (
     <div>
       <div className='optionBoxContainer'>
-        <div className="optionBox" onClick={() => handleSelect('needsRoom')}>
+        <div
+          className="optionBox"
+          onClick={() => handleSelect('needsRoom')}
+        >
           <h3>A Room</h3>
-          <img className="homeIcon" src={homeIcon}/>
+          <img className="homeIcon" src={homeIcon} alt="Home Icon" />
           <p>I’m looking for a room in an existing house share.</p>
         </div>
 
-        <div className="optionBox" onClick={() => handleSelect('hasRoom')}>
+        <div
+          className="optionBox"
+          onClick={() => handleSelect('hasRoom')}
+        >
           <h3>A Roomie</h3>
-          <img className="roomIcon" src={homeIcon}/>
-          <p>I’m looking for someone to fill an empty room in my home</p>
+          <img className="roomIcon" src={roomIcon} alt="Room Icon" />
+          <p>I’m looking for someone to fill an empty room in my home.</p>
         </div>
       </div>
 
