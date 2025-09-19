@@ -325,6 +325,75 @@ app.get('/api/matches', async (req, res) => {
     }
 });
 
+//question grabber for questionnaire
+// app.get('/api/questions', async (req, res) => {
+//   try {
+//     // 1. Get all questions
+//     const [questions] = await db.query(
+//       `SELECT question_id, question_text, question_type FROM questions ORDER BY question_id`
+//     );
+
+//     // 2. Get all options
+//     const [options] = await db.query(
+//       `SELECT question_options_id, question_id, option_text FROM question_options`
+//     );
+
+//     // 3. Attach options to each question
+//     const questionsWithOptions = questions.map((q) => ({
+//       ...q,
+//       options: options.filter((o) => o.question_id === q.question_id),
+//     }));
+
+//     res.json(questionsWithOptions);
+//   } catch (err) {
+//     console.error('Failed to fetch questions:', err);
+//     res.status(500).json({ error: 'Failed to fetch questions' });
+//   }
+// });
+
+// GET /api/questions
+
+app.get('/api/questions', async (req, res) => {
+  try {
+    const allowedIds = [1, 3, 5, 6, 8, 10, 12];
+
+    // Convert IDs to a comma-separated string for SQL
+    const idsStr = allowedIds.join(',');
+
+    // Fetch only the selected questions
+    const questionsResult = await db.query(
+      `SELECT question_id, question_text, question_type 
+       FROM questions 
+       WHERE question_id IN (${idsStr})
+       ORDER BY question_id`
+    );
+    const questions = Array.isArray(questionsResult[0]) ? questionsResult[0] : questionsResult;
+
+    // Fetch only options for those questions
+    const optionsResult = await db.query(
+      `SELECT question_options_id, question_id, option_text 
+       FROM question_options 
+       WHERE question_id IN (${idsStr})`
+    );
+    const options = Array.isArray(optionsResult[0]) ? optionsResult[0] : optionsResult;
+
+    // Attach options to their questions
+    const questionsWithOptions = questions.map(q => ({
+      ...q,
+      options: options.filter(o => o.question_id === q.question_id)
+    }));
+
+    res.json(questionsWithOptions);
+
+  } catch (err) {
+    console.error('Failed to fetch questions:', err);
+    res.status(500).json({ error: 'Failed to fetch questions', details: err.message });
+  }
+});
+
+
+
+
 //Added routes to try and get login working:
 
 app.get('/api/session', (req, res) => {
@@ -333,11 +402,13 @@ app.get('/api/session', (req, res) => {
       loggedIn: true,
       userId: req.session.user_id,
       email: req.session.email,
+      profileComplete: req.session.profileComplete || false,
     });
   } else {
     res.json({ loggedIn: false });
   }
 });
+
 
 app.get('/api/users/:id', async (req, res) => {
   const userId = req.params.id;
@@ -478,6 +549,250 @@ app.post('/api/logout', (req, res) => {
     res.json({ message: 'Logged out successfully' });
   });
 });
+
+app.post('/api/profile-setup', async (req, res) => {
+  const userId = req.session?.user_id;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
+  const { step1, step2, step3, step4, step5 } = req.body; // fullProfileData
+
+  try {
+    if (step1) {
+      await db.query(
+        `UPDATE profiles 
+          SET bio = ?,
+              profile_picture_url = ?
+        WHERE user_id = ?`,
+        [
+          step1.bio || '',
+          step1.profilePictureUrl || null,
+          userId
+        ]
+      );
+    }
+
+    if (step2) {
+      await db.query(
+        `UPDATE users SET 
+          occupation = ?,
+          occupation_visible = ?,
+          student_status = ?,
+          student_status_visible = ?,
+          pet_owner = ?,
+          smoker_status = ?,
+          pronouns = ?, 
+          pronouns_visible = ?,
+          lgbtq_identity = ?, 
+          lgbtq_identity_visible = ?, 
+          seeking_lgbtq_home = ?, 
+          seeking_lgbtq_home_visible = ?, 
+          gender_identity = ?,
+          gender_identity_visible = ?,
+          seeking_women_only_home = ?,
+          seeking_women_only_home_visible = ?
+         WHERE user_id = ?`,
+        [
+          step2.workStatus || null,
+          step2.hideWorkStatus || null,
+          step2.student || null,
+          step2.hideStudent || null,
+          step2.pets || null,
+          step2.smokingOptions.join(', ') || null,
+          step2.pronouns || null,
+          step2.hidePronouns || null,
+          step2.lgbtq || null,
+          step2.hideLgbtq || null,
+          step2.lgbtqPreference || null,
+          step2.hideLgbtqPreference || null,
+          step2.genderIdentity || null,
+          step2.hideGenderIdentity || null,
+          step2.genderPreference || null,
+          step2.hideGenderPreference || null,
+          userId
+        ]
+      );
+    }
+
+    // Step 4
+    if (step4) {
+      if (step4.listingType === 'hasRoom') {
+        const [existing] = await db.query(
+          `SELECT * FROM roomListings WHERE user_id = ?`,
+          [userId]
+        );
+
+        let roomId;
+        if (existing.length > 0) {
+          roomId = existing[0].room_id;
+          await db.query(
+            `UPDATE roomListings SET
+              location = ?,
+              rent = ?,
+              move_in_date_min = ?,
+              move_in_date_max = ?,
+              tenancy_length = ?,
+              num_flatmates = ?,
+              age_range_min = ?,
+              age_range_max = ?,
+              description = ?,
+              women_only_household = ?,
+              lgbtq_only_household = ?
+            WHERE user_id = ?`,
+            [
+              step4.location || null,
+              step4.rent || null,
+              step4.available_date || null,
+              null,
+              step4.tenancy_length || null,
+              step4.flatmates_current || null,
+              step4.flatmates_age_min || null,
+              step4.flatmates_age_max || null,
+              step4.description || null,
+              step4.womenOnlyHomeYN || null,
+              step4.lgbtqOnlyHomeYN || null,
+              userId
+            ]
+          );
+          await db.query(`DELETE FROM listing_photos WHERE room_id = ?`, [roomId]);
+        } else {
+          const [result] = await db.query(
+            `INSERT INTO roomListings
+              (user_id, location, rent, move_in_date_min, move_in_date_max, tenancy_length, num_flatmates, age_range_min, age_range_max, description, women_only_household, lgbtq_only_household)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              userId,
+              step4.location || null,
+              step4.rent || null,
+              step4.available_date || null,
+              null,
+              step4.tenancy_length || null,
+              step4.flatmates_current || null,
+              step4.flatmates_age_min || null,
+              step4.flatmates_age_max || null,
+              step4.description || null,
+              step4.womenOnlyHomeYN || null,
+              step4.lgbtqOnlyHomeYN || null
+            ]
+          );
+          roomId = result.insertId;
+        }
+
+        if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
+          throw new Error("You must submit between 3 and 10 photos.");
+        }
+        const photoInserts = step4.photos.map(photoUrl =>
+          db.query(`INSERT INTO listing_photos (room_id, photo_url) VALUES (?, ?)`, [roomId, photoUrl])
+        );
+        await Promise.all(photoInserts);
+
+      } else if (step4.listingType === 'needsRoom') {
+        const [existing] = await db.query(
+          `SELECT * FROM flatmateListings WHERE user_id = ?`,
+          [userId]
+        );
+
+        let flatmateId;
+        if (existing.length > 0) {
+          flatmateId = existing[0].flatmate_id;
+          await db.query(
+            `UPDATE flatmateListings SET
+              location = ?,
+              budget_min = ?,
+              budget_max = ?,
+              move_in_date_min = ?,
+              move_in_date_max = ?,
+              stay_length = ?,
+              num_flatmates_min = ?,
+              num_flatmates_max = ?,
+              age_range_min = ?,
+              age_range_max = ?,
+              description = ?
+            WHERE user_id = ?`,
+            [
+              step4.preferred_location || null,
+              step4.budget_min || null,
+              step4.budget_max || null,
+              step4.move_in_min || null,
+              step4.move_in_max || null,
+              step4.stay_length || null,
+              step4.flatmates_min || null,
+              step4.flatmates_max || null,
+              step4.flatmates_age_min_preferred || null,
+              step4.flatmates_age_max_preferred || null,
+              step4.description || null,
+              userId
+            ]
+          );
+          await db.query(`DELETE FROM listing_photos WHERE flatmate_id = ?`, [flatmateId]);
+        } else {
+          const [result] = await db.query(
+            `INSERT INTO flatmateListings
+              (user_id, location, budget_min, budget_max, move_in_date_min, move_in_date_max, stay_length, num_flatmates_min, num_flatmates_max, age_range_min, age_range_max, description)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              userId,
+              step4.preferred_location || null,
+              step4.budget_min || null,
+              step4.budget_max || null,
+              step4.move_in_min || null,
+              step4.move_in_max || null,
+              step4.stay_length || null,
+              step4.flatmates_min || null,
+              step4.flatmates_max || null,
+              step4.flatmates_age_min_preferred || null,
+              step4.flatmates_age_max_preferred || null,
+              step4.description || null
+            ]
+          );
+          flatmateId = result.insertId;
+        }
+
+        if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
+          throw new Error("You must submit between 3 and 10 photos.");
+        }
+        const photoInserts = step4.photos.map(photoUrl =>
+          db.query(`INSERT INTO listing_photos (flatmate_id, photo_url) VALUES (?, ?)`, [flatmateId, photoUrl])
+        );
+        await Promise.all(photoInserts);
+      }
+    }
+
+    // ✅ Step 5 goes *inside the same try block*
+    if (step5 && Array.isArray(step5)) {
+      for (const ans of step5) {
+        if (!ans.question_id || !ans.question_options_id) continue;
+
+        const result = await db.query(
+          `SELECT * FROM user_answers WHERE user_id = ? AND question_id = ?`,
+          [userId, ans.question_id]
+        );
+        const existing = Array.isArray(result[0]) ? result[0] : result;
+
+        if (existing.length > 0) {
+          await db.query(
+            `DELETE FROM user_answers WHERE user_id = ? AND question_id = ?`,
+            [userId, ans.question_id]
+          );
+        }
+
+        await db.query(
+          `INSERT INTO user_answers 
+            (user_id, question_id, question_options_id, answer_rank, created_at, updated_at)
+          VALUES (?, ?, ?, NULL, NOW(), NOW())`,
+          [userId, ans.question_id, ans.question_options_id]
+        );
+      }
+    }
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('Profile setup save error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
 
 
 // Start server on port 3000

@@ -5,15 +5,15 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(`/api/listings`, {
+      const response = await fetch(`/api/profile-setup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          step4: data,
           listingType, // 'hasRoom' or 'needsRoom'
           userId,
-          ...data
         }),
       });
 
@@ -83,8 +83,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         ) : (
           <>
             <label>How long do you want to stay?</label>
-            <input type="text" placeholder="Minimum" {...register('stay_length_min')} />
-            <input type="text" placeholder="Maximum" {...register('stay_length_max')} />
+            <input type="number" placeholder="Months" {...register('stay_length')} />
           </>
         )}
       </div>
@@ -137,21 +136,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         )}
       </div>
 
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>Is your home a women-only home?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
-            <label>Is your home a lgbtq+ only home?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>
-          </>
-        ) : 
-        (
-          <></>
-        )}
-          </div>
+      
 
       {/* Description */}
       <div>
@@ -167,6 +152,22 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           </>
         )}
       </div>
+
+      <div>
+        {listingType === 'hasRoom' ? (
+          <>
+            <label>Is your home a women-only home?</label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
+            <label>Is your home a lgbtq+ only home?</label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>
+          </>
+        ) : 
+        (
+          <></>
+        )}
+          </div>
 
       {/* Navigation Buttons */}
       <div style={{ marginTop: '1rem' }}>

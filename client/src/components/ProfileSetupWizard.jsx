@@ -4,19 +4,37 @@ import Step2ProfileInfo from "./Step2ProfileInfo";
 import Step3RoomOrRoomie from "./Step3RoomOrRoomie";
 import Step4CreateListing from "./Step4CreateListing";
 import Step5Questionnaire from "./Step5Questionnaire";
+import { useSession } from "./SessionContext.jsx";
 
 function ProfileSetupWizard() {
+  const { session } = useSession();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({});
+  const [isComplete, setIsComplete] = useState(false); // ✅ new state
+  const userId = session.userId;
 
   const handleStepData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }));
-    setStep((prev) => prev + 1);
+
+    if (step < 5) {
+      setStep((prev) => prev + 1);
+    } else {
+      setIsComplete(true); // ✅ mark as complete at step 5
+    }
   };
 
   const handlePrevious = () => {
     setStep((prev) => Math.max(prev - 1, 1));
   };
+
+  if (isComplete) {
+    return (
+      <div className="profileSetupPage">
+        <h1>🎉 Profile complete!</h1>
+        <p>Your profile has been set up successfully.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="profileSetupPage">
@@ -79,6 +97,7 @@ function ProfileSetupWizard() {
           <Step4CreateListing
             onNext={handleStepData}
             onPrevious={handlePrevious}
+            listingType={formData.listingType}
             defaultValues={{
               rent: formData.rent,
               budget_min: formData.budget_min,
@@ -109,7 +128,10 @@ function ProfileSetupWizard() {
         {step === 5 && (
           <Step5Questionnaire
             onNext={handleStepData}
+            onPrevious={handlePrevious}
             defaultValues={formData}
+            formData={formData}
+            userId={userId}
           />
         )}
       </div>

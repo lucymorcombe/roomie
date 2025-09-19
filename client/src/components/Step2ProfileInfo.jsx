@@ -107,6 +107,20 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           </div>
         </div>
 
+        {/* LGBTQ+ housing preference – always shown */}
+        <div className='horizontalField'>
+          <div className='leftColumn'>
+            <label>Are you seeking an LGBTQ+ home/housemate?</label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqPreference')} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqPreference')} /> No</label>
+          </div>
+          <div className='rightColumn'>
+            <label className='hideOption'>
+              <input type="checkbox" {...register('hideLgbtqPreference')} />
+            </label>
+          </div>
+        </div>
+
         <div className='horizontalField'>
           <div className='leftColumn'>
             <label>What is your gender identity?</label>
@@ -137,19 +151,7 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           </div>
         </div>
 
-        {/* LGBTQ+ housing preference – always shown */}
-        <div className='horizontalField'>
-          <div className='leftColumn'>
-            <label>Are you seeking an LGBTQ+ home/housemate?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqPreference')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqPreference')} /> No</label>
-          </div>
-          <div className='rightColumn'>
-            <label className='hideOption'>
-              <input type="checkbox" {...register('hideLgbtqPreference')} />
-            </label>
-          </div>
-        </div>
+        
 
         
 
