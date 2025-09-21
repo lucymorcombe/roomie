@@ -5,12 +5,18 @@ function Step1ProfileInfo({ onNext, defaultValues }) {
 
   const { register, handleSubmit } = useForm({ defaultValues });
 
-  const onSubmit = (data) => {
-    onNext(data); // send the form data to parent (the wizard)
+  const onSubmitStep1 = (data) => {
+    const step1Data = {
+      bio: data.bio,
+      profilePicture: data.profilePicture?.[0] || null,
+      profilePictureUrl: null
+    };
+
+    onNext(step1Data); //send data to wizard
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmitStep1)}>
       <label>
         Profile Picture:
         <input type="file" {...register('profilePicture')} />
@@ -27,4 +33,4 @@ function Step1ProfileInfo({ onNext, defaultValues }) {
   );
 }
 
-export default Step1ProfileInfo
+export default Step1ProfileInfo;

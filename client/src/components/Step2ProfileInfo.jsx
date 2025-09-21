@@ -1,27 +1,57 @@
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 
 function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
   console.log("Step2 defaultValues:", defaultValues);
 
-  const { register, handleSubmit } = useForm({ defaultValues });
+  const { register, handleSubmit, watch } = useForm({ defaultValues });
+  // const [smokingOptions, setSmokingOptions] = useState(defaultValues.smokingOptions || []);
 
-  const onSubmit = (data) => {
-    onNext(data);
+  // const handleCheckboxChange = (e) => {
+  //   const { value, checked } = e.target;
+  //   setSmokingOptions((prev) => {
+  //     if (checked) return [...prev, value];
+  //     return prev.filter((v) => v !== value);
+  //   });
+  // };
+
+  const onSubmitStep2 = (data) => {
+    const step2Data = {
+      workStatus: data.workStatus,
+      student: data.student,
+      pets: data.pets,
+      pronouns: data.pronouns,
+      lgbtq: data.lgbtq,
+      genderIdentity: data.genderIdentity,
+      genderPreference: data.genderPreference,
+      lgbtqPreference: data.lgbtqPreference,
+      smokes: data.smokes,
+      hideWorkStatus: data.hideWorkStatus,
+      hideStudent: data.hideStudent,
+      hidePets: data.hidePets,
+      hidePronouns: data.hidePronouns,
+      hideLgbtq: data.hideLgbtq,
+      hideGenderIdentity: data.hideGenderIdentity,
+      hideGenderPreference: data.hideGenderPreference,
+      hideLgbtqPreference: data.hideLgbtqPreference
+    };
+
+    onNext(step2Data);
+
   };
-
+  
   return (
     <div className='stepTwo'>
-      
-        <p className='stepIntro'>
-          This is the information that will be highlighted on your profile and ads. We need to know whether
-          you smoke, vape, or have any pets, but other than that it is your choice what you’d like to share.
-        </p>
-        
-        <div className='hideNotice'>
-            <p>Hide from<br/>profile</p>
-        </div>
-        
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <p className='stepIntro'>
+        This is the information that will be highlighted on your profile and ads. We need to know whether
+        you smoke, vape, or have any pets, but other than that it is your choice what you’d like to share.
+      </p>
+
+      <div className='hideNotice'>
+        <p>Hide from<br/>profile</p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmitStep2)}>
         {/* Work status */}
         <div className='horizontalField'>
           <div className="leftColumn">
@@ -58,20 +88,26 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           <label className='horizontal'><input type="radio" value="no" {...register('pets', { required: true })} /> No</label>
         </div>
 
-        {/* Smoking/Vaping */}
         <div className='horizontalField leftColumn'>
-            <label>Do you smoke or vape?</label>
-            <label className='horizontal'>
-                <input type="checkbox" value="smoke" {...register('smokingOptions', { required: true })} /> I smoke
-            </label>
-            <label className='horizontal'>
-                <input type="checkbox" value="vape" {...register('smokingOptions', { required: true })} /> I vape
-            </label>
-            <label className='horizontal'>
-                <input type="checkbox" value="neither" {...register('smokingOptions', { required: true })} /> Neither
-            </label>
-
+          <label className='horizontal'>Do you smoke or vape?</label>
+          <label className='horizontal'><input type="radio" value="yes" {...register('smokes', { required: true })} /> Yes</label>
+          <label className='horizontal'><input type="radio" value="no" {...register('smokes', { required: true })} /> No</label>
         </div>
+
+        {/* Smoking/Vaping
+        <div className='horizontalField leftColumn'>
+          <label>Do you smoke or vape?</label>
+          <label className='horizontal'>
+            <input type="checkbox" value="yes" checked={smokingOptions.includes('yes')} onChange={handleCheckboxChange} /> I smoke
+          </label>
+          <label className='horizontal'>
+            <input type="checkbox" value="no" checked={smokingOptions.includes('no')} onChange={handleCheckboxChange} /> I vape
+          </label>
+          {/* <label className='horizontal'>
+            <input type="checkbox" value="neither" checked={smokingOptions.includes('neither')} onChange={handleCheckboxChange} /> Neither
+          </label> 
+        </div>}
+         */}
 
         {/* Pronouns */}
         <div className='horizontalField'>
@@ -121,6 +157,7 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           </div>
         </div>
 
+        {/* Gender identity */}
         <div className='horizontalField'>
           <div className='leftColumn'>
             <label>What is your gender identity?</label>
@@ -138,6 +175,7 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           </div>
         </div>
 
+        {/* Gender preference */}
         <div className='horizontalField'>
           <div className='leftColumn'>
             <label>Are you seeking a women-only home/housemate?</label>
@@ -150,10 +188,6 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
             </label>
           </div>
         </div>
-
-        
-
-        
 
         <div style={{ marginTop: '1rem' }}>
           <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>

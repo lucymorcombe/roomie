@@ -50,22 +50,24 @@ function Step5Questionnaire({ onNext, formData, userId }) {
     });
 
     // Send to backend
-    fetch("/api/profile-setup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...formData, step5: answers, userId }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.success) {
-          console.log("Step 5 saved!");
-          onNext({ ...formData, step5: answers });
-        } else {
-          console.error(result.error);
-        }
-      })
-      .catch((err) => console.error("Error submitting Step 5:", err));
-  };
+  //   fetch("/api/profile-setup", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ ...formData, step5: answers, userId }),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((result) => {
+  //       if (result.success) {
+  //         console.log("Step 5 saved!");
+  //         onNext({ ...formData, step5: answers });
+  //       } else {
+  //         console.error(result.error);
+  //       }
+  //     })
+  //     .catch((err) => console.error("Error submitting Step 5:", err));
+  // };
+    onNext({step5: answers});
+};
 
   if (loading) return <p>Loading questionnaire...</p>;
 

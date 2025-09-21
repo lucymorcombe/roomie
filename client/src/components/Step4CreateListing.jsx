@@ -3,36 +3,36 @@ import { useForm } from 'react-hook-form';
 function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, userId }) {
   const { register, handleSubmit } = useForm({ defaultValues });
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await fetch(`/api/profile-setup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          step4: data,
-          listingType, // 'hasRoom' or 'needsRoom'
-          userId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save listing');
-      }
-
-      const result = await response.json();
-
-      // Continue to next step with saved listing info
-      onNext({ ...data, listingId: result.insertId });
-    } catch (err) {
-      console.error(err);
-      alert('Could not save your listing. Please try again.');
-    }
+  const onSubmitStep4 = (data) => {
+    const step4Data = {
+      listingType: listingType, // Include listing type from props
+      rent: data.rent,
+      budget_min: data.budget_min,
+      budget_max: data.budget_max,
+      available_date: data.available_date,
+      move_in_min: data.move_in_min,
+      move_in_max: data.move_in_max,
+      tenancy_length: data.tenancy_length,
+      stay_length: data.stay_length,
+      location: data.location,
+      preferred_location: data.preferred_location,
+      flatmates_current: data.flatmates_current,
+      flatmates_min: data.flatmates_min,
+      flatmates_max: data.flatmates_max,
+      flatmates_age_min: data.flatmates_age_min,
+      flatmates_age_max: data.flatmates_age_max,
+      flatmates_age_min_preferred: data.flatmates_age_min_preferred,
+      flatmates_age_max_preferred: data.flatmates_age_max_preferred,
+      womenOnlyHomeYN: data.womenOnlyHomeYN,
+      lgbtqOnlyHomeYN: data.lgbtqOnlyHomeYN,
+      description: data.description,
+      photos: data.photos 
+    };
+    onNext(step4Data);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmitStep4)}>
       <h2>Create your ad</h2>
 
       {/* Upload photos */}

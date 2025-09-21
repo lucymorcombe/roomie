@@ -1,37 +1,42 @@
 // Import express.js
-const express = require("express");
-const path = require('path');
-const cors = require('cors');
-var app = express();
+import express from "express";
+import path from "path";
+import cors from "cors";
+import session from "express-session";
+import { fileURLToPath } from "url";
+
+// Get __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import db from './services/db.js';
+import { User } from "./models/user.js";
+
+const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', 
-  credentials: true                 
+  origin: 'http://localhost:5173',
+  credentials: true
 }));
 
-app.use(express.urlencoded({ extended: true }))
-app.use('/images', express.static(path.join(process.cwd(), 'app/public/images')));
+app.use(express.urlencoded({ extended: true }));
+app.use('/images', express.static(path.join(__dirname, 'app/public/images')));
 
 // Add static files location
 app.use(express.static("static"));
 
 app.use(express.json());
 
-// Get the functions in the db.js file to use
-const db = require('./services/db');
-
-const { User } = require("./models/user");
-
-var session = require('express-session');
 app.use(session({
   secret: 'secretkeysdfjsflyoifasd',
   resave: false,
   saveUninitialized: true,
-  cookie: { 
+  cookie: {
     secure: false,
-    maxAge: 10 * 60 * 1000 
-}
+    maxAge: 10 * 60 * 1000
+  }
 }));
+
 
 
 // const SIMULATED_USER_ID = 1;
@@ -551,6 +556,8 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.post('/api/profile-setup', async (req, res) => {
+  console.log('Incoming request body:', req.body);
+
   const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
@@ -558,22 +565,75 @@ app.post('/api/profile-setup', async (req, res) => {
 
   try {
     if (step1) {
-      await db.query(
-        `UPDATE profiles 
-          SET bio = ?,
-              profile_picture_url = ?
-        WHERE user_id = ?`,
-        [
-          step1.bio || '',
-          step1.profilePictureUrl || null,
-          userId
-        ]
-      );
-    }
+  console.log('Processing step1...', step1);
+  
+  // Check if profile exists
+  const existingProfile = await db.query(
+    `SELECT user_id FROM profiles WHERE user_id = ?`,
+    [userId]
+  );
+  
+  if (existingProfile.length > 0) {
+    // Profile exists, update it
+    await db.query(
+      `UPDATE profiles 
+        SET bio = ?,
+            profile_picture_url = ?
+      WHERE user_id = ?`,
+      [
+        step1.bio || '',
+        step1.profilePictureUrl || null,
+        userId
+      ]
+    );
+  } 
+  // else {
+  //   // Profile doesn't exist, create it
+  //   await db.query(
+  //     `INSERT INTO profiles (user_id, bio, profile_picture_url, occupation, occupation_visible, student_status, 
+  //     student_status_visible, pet_owner, smoker_status, pronouns, pronouns_visible, 
+  //     lgbtq_identity, lgbtq_identity_visible, seeking_lgbtq_home, seeking_lgbtq_home_visible, 
+  //     gender_identity, gender_identity_visible, seeking_women_only_home, seeking_women_only_home_visible) 
+  //      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  //     [
+  //       userId,
+  //       step1.bio || '',
+  //       step1.profilePictureUrl || null,
+  //       null,
+  //       1,
+  //       null,
+  //       1,
+  //       0,
+  //       null,
+  //       null,
+  //       1,
+  //       0,
+  //       1,
+  //       0,
+  //       1,
+  //       null,
+  //       1,
+  //       0,
+  //       1,
+  //     ]
+  //   );
+  // }
+  console.log('Step1 completed');
+}
 
-    if (step2) {
+  if (step2) {
+    console.log('Processing step2...', step2);
+    
+    // Check if profile exists (it should exist after step1, but just to be safe)
+    const existingProfile = await db.query(
+      `SELECT user_id FROM profiles WHERE user_id = ?`,
+      [userId]
+    );
+    
+    if (existingProfile.length > 0) {
+      // Profile exists, update it
       await db.query(
-        `UPDATE users SET 
+        `UPDATE profiles SET 
           occupation = ?,
           occupation_visible = ?,
           student_status = ?,
@@ -590,14 +650,15 @@ app.post('/api/profile-setup', async (req, res) => {
           gender_identity_visible = ?,
           seeking_women_only_home = ?,
           seeking_women_only_home_visible = ?
-         WHERE user_id = ?`,
+        WHERE user_id = ?`,
         [
           step2.workStatus || null,
           step2.hideWorkStatus || null,
-          step2.student || null,
+          step2.student === 'yes' ? 1 : 0,
           step2.hideStudent || null,
-          step2.pets || null,
-          step2.smokingOptions.join(', ') || null,
+          step2.pets === 'yes' ? 1 : 0,
+          step2.smokes === 'yes' ? 1 : 0,
+          // step2.smokingOptions ? step2.smokingOptions.join(', ') : null,
           step2.pronouns || null,
           step2.hidePronouns || null,
           step2.lgbtq || null,
@@ -611,12 +672,77 @@ app.post('/api/profile-setup', async (req, res) => {
           userId
         ]
       );
+    } else {
+      // Profile doesn't exist, create it with step2 data
+      await db.query(
+        `INSERT INTO profiles 
+        (user_id, bio, profile_picture_url, occupation, occupation_visible, student_status, student_status_visible, 
+          pet_owner, smoker_status, pronouns, pronouns_visible, lgbtq_identity, 
+          lgbtq_identity_visible, seeking_lgbtq_home, seeking_lgbtq_home_visible, 
+          gender_identity, gender_identity_visible, seeking_women_only_home, 
+          seeking_women_only_home_visible) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          userId,
+          step1.bio || '',
+          step1.profilePictureUrl || null,
+          step2.workStatus || null,
+          step2.hideWorkStatus || null,
+          step2.student === 'yes' ? 1 : 0,
+          step2.hideStudent || null,
+          step2.pets === 'yes' ? 1 : 0,
+          step2.smokes === 'yes' ? 1 : 0,
+          // step2.smokingOptions ? step2.smokingOptions.join(', ') : null,
+          step2.pronouns || null,
+          step2.hidePronouns || null,
+          step2.lgbtq === 'yes' ? 1 : 0,
+          step2.hideLgbtq || null,
+          step2.lgbtqPreference === 'yes' ? 1 : 0,
+          step2.hideLgbtqPreference || null,
+          step2.genderIdentity || null,
+          step2.hideGenderIdentity || null,
+          step2.genderPreference === 'yes' ? 1 : 0,
+          step2.hideGenderPreference || null
+        ]
+      );
     }
+    console.log('Step2 completed');
+  }
 
     // Step 4
     if (step4) {
       if (step4.listingType === 'hasRoom') {
-        const [existing] = await db.query(
+        // In your step4 processing, before any destructuring:
+console.log('About to query roomListings...');
+
+try {
+  const queryResult = await db.query(
+    `SELECT * FROM roomListings WHERE user_id = ?`,
+    [userId]
+  );
+  
+  console.log('Raw query result:', queryResult);
+  console.log('Type of result:', typeof queryResult);
+  console.log('Is array?', Array.isArray(queryResult));
+  
+  // Now handle the result appropriately
+  let existing;
+  if (Array.isArray(queryResult)) {
+    existing = queryResult; // Use the result directly
+  } else if (Array.isArray(queryResult[0])) {
+    existing = queryResult[0]; // Use the first element if it's nested
+  } else {
+    existing = [];
+  }
+  
+  console.log('Processed existing:', existing);
+  console.log('Length:', existing.length);
+  
+} catch (error) {
+  console.error('Query error:', error);
+  throw error;
+}
+        const existing = await db.query(
           `SELECT * FROM roomListings WHERE user_id = ?`,
           [userId]
         );
@@ -648,14 +774,14 @@ app.post('/api/profile-setup', async (req, res) => {
               step4.flatmates_age_min || null,
               step4.flatmates_age_max || null,
               step4.description || null,
-              step4.womenOnlyHomeYN || null,
-              step4.lgbtqOnlyHomeYN || null,
+              step4.womenOnlyHomeYN === 'yes' ? 1 : 0,
+              step4.lgbtqOnlyHomeYN === 'yes' ? 1 : 0,
               userId
             ]
           );
           await db.query(`DELETE FROM listing_photos WHERE room_id = ?`, [roomId]);
         } else {
-          const [result] = await db.query(
+          const result = await db.query(
             `INSERT INTO roomListings
               (user_id, location, rent, move_in_date_min, move_in_date_max, tenancy_length, num_flatmates, age_range_min, age_range_max, description, women_only_household, lgbtq_only_household)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -670,23 +796,23 @@ app.post('/api/profile-setup', async (req, res) => {
               step4.flatmates_age_min || null,
               step4.flatmates_age_max || null,
               step4.description || null,
-              step4.womenOnlyHomeYN || null,
-              step4.lgbtqOnlyHomeYN || null
+              step4.womenOnlyHomeYN === 'yes' ? 1 : 0,
+              step4.lgbtqOnlyHomeYN === 'yes' ? 1 : 0
             ]
           );
           roomId = result.insertId;
         }
 
-        if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
-          throw new Error("You must submit between 3 and 10 photos.");
-        }
-        const photoInserts = step4.photos.map(photoUrl =>
-          db.query(`INSERT INTO listing_photos (room_id, photo_url) VALUES (?, ?)`, [roomId, photoUrl])
-        );
-        await Promise.all(photoInserts);
+        // if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
+        //   throw new Error("You must submit between 3 and 10 photos.");
+        // }
+        // const photoInserts = step4.photos.map(photoUrl =>
+        //   db.query(`INSERT INTO listing_photos (room_id, photo_url) VALUES (?, ?)`, [roomId, photoUrl])
+        // );
+        // await Promise.all(photoInserts);
 
       } else if (step4.listingType === 'needsRoom') {
-        const [existing] = await db.query(
+        const existing = await db.query(
           `SELECT * FROM flatmateListings WHERE user_id = ?`,
           [userId]
         );
@@ -747,42 +873,88 @@ app.post('/api/profile-setup', async (req, res) => {
           flatmateId = result.insertId;
         }
 
-        if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
-          throw new Error("You must submit between 3 and 10 photos.");
-        }
-        const photoInserts = step4.photos.map(photoUrl =>
-          db.query(`INSERT INTO listing_photos (flatmate_id, photo_url) VALUES (?, ?)`, [flatmateId, photoUrl])
-        );
-        await Promise.all(photoInserts);
+        // if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
+        //   throw new Error("You must submit between 3 and 10 photos.");
+        // }
+        // const photoInserts = step4.photos.map(photoUrl =>
+        //   db.query(`INSERT INTO listing_photos (flatmate_id, photo_url) VALUES (?, ?)`, [flatmateId, photoUrl])
+        // );
+        // await Promise.all(photoInserts);
       }
     }
 
     // ✅ Step 5 goes *inside the same try block*
-    if (step5 && Array.isArray(step5)) {
-      for (const ans of step5) {
-        if (!ans.question_id || !ans.question_options_id) continue;
+    // if (step5 && Array.isArray(step5)) {
+    //   for (const ans of step5) {
+    //     if (!ans.question_id || !ans.question_options_id) continue;
 
-        const result = await db.query(
-          `SELECT * FROM user_answers WHERE user_id = ? AND question_id = ?`,
+    //     const result = await db.query(
+    //       `SELECT * FROM user_answers WHERE user_id = ? AND question_id = ?`,
+    //       [userId, ans.question_id]
+    //     );
+    //     const existing = Array.isArray(result[0]) ? result[0] : result;
+
+    //     if (existing.length > 0) {
+    //       await db.query(
+    //         `DELETE FROM user_answers WHERE user_id = ? AND question_id = ?`,
+    //         [userId, ans.question_id]
+    //       );
+    //     }
+
+    //     await db.query(
+    //       `INSERT INTO user_answers 
+    //         (user_id, question_id, question_options_id, answer_rank, created_at, updated_at)
+    //       VALUES (?, ?, ?, NULL, NOW(), NOW())`,
+    //       [userId, ans.question_id, ans.question_options_id]
+    //     );
+    //   }
+    // }
+
+    // ✅ Step 5 goes *inside the same try block*
+  if (step5 && Array.isArray(step5)) {
+    console.log('Processing step5...'); 
+    console.log('step5 data:', step5);
+    console.log('step5 length:', step5.length);
+    
+    for (const ans of step5) {
+      console.log('Processing answer:', ans);
+      
+      if (!ans.question_id || !ans.question_options_id) continue;
+
+      console.log('Querying existing answers...');
+      const result = await db.query(
+        `SELECT * FROM user_answers WHERE user_id = ? AND question_id = ?`,
+        [userId, ans.question_id]
+      );
+      
+      console.log('Query result type:', typeof result);
+      console.log('Query result is array:', Array.isArray(result));
+      console.log('Query result:', result);
+      
+      // This line might be causing the issue:
+      const existing = Array.isArray(result[0]) ? result[0] : result;
+      
+      console.log('Processed existing:', existing);
+      console.log('Existing length:', existing ? existing.length : 'undefined');
+
+      if (existing.length > 0) {
+        console.log('Deleting existing answers...');
+        await db.query(
+          `DELETE FROM user_answers WHERE user_id = ? AND question_id = ?`,
           [userId, ans.question_id]
         );
-        const existing = Array.isArray(result[0]) ? result[0] : result;
-
-        if (existing.length > 0) {
-          await db.query(
-            `DELETE FROM user_answers WHERE user_id = ? AND question_id = ?`,
-            [userId, ans.question_id]
-          );
-        }
-
-        await db.query(
-          `INSERT INTO user_answers 
-            (user_id, question_id, question_options_id, answer_rank, created_at, updated_at)
-          VALUES (?, ?, ?, NULL, NOW(), NOW())`,
-          [userId, ans.question_id, ans.question_options_id]
-        );
       }
+
+      console.log('Inserting new answer...');
+      await db.query(
+        `INSERT INTO user_answers 
+          (user_id, question_id, question_options_id, answer_rank, created_at, updated_at)
+        VALUES (?, ?, ?, NULL, NOW(), NOW())`,
+        [userId, ans.question_id, ans.question_options_id]
+      );
     }
+    console.log('Step5 completed successfully');
+  }
 
     res.json({ success: true });
 
