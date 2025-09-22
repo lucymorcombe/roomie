@@ -6,8 +6,8 @@ function GetStarted() {
   const [activeTab, setActiveTab] = useState('login'); 
 
   return (
-    <div>
-      <div style={{ display: 'flex', marginBottom: '1rem' }}>
+    <div className="get-started-container"> {/* ✅ */}
+      <div className="tab-buttons" style={{ display: 'flex', marginBottom: '1rem' }}> {/* ✅ */}
         <button
           onClick={() => setActiveTab('login')}
           style={{
@@ -15,6 +15,7 @@ function GetStarted() {
             padding: '0.5rem',
             fontWeight: activeTab === 'login' ? 'bold' : 'normal',
           }}
+          className={activeTab === 'login' ? 'active' : ''} // ✅
         >
           Login
         </button>
@@ -25,6 +26,7 @@ function GetStarted() {
             padding: '0.5rem',
             fontWeight: activeTab === 'register' ? 'bold' : 'normal',
           }}
+          className={activeTab === 'register' ? 'active' : ''} // ✅
         >
           Register
         </button>

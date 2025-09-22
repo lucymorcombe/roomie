@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { useSession } from './components/SessionContext';
 import LogoutButton from './components/LogoutButton';  // <-- import LogoutButton
 import "./App.css";
-import logo from "./assets/roomieLogoShadow.jpg";
+import logo from "./assets/logo-pink-background-clipped.jpg";
 import HomePage from './pages/HomePage';
 import AboutUs from './pages/AboutUs';
 import RoomiePicks from './pages/RoomiePicks';

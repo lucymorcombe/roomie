@@ -1,10 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+/*font-family: "DM Sans", sans-serif;*/
 /*  font-family: "Inter", sans-serif; */
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "DM Sans", sans-serif;
+  background-color: #E82E81;
+  margin: 0 auto;
+  overflow-x: hidden;
 }
 
 p {
@@ -12,28 +20,53 @@ p {
 }
 
 h1 {
-  font-size: 36px;
-  color: #F25278;
+  font-size: 4rem;
+  color: #fafcff;
   text-shadow: 0px 0px 1px #000;
+  text-align: center;
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+
+h2 {
+  font-size: 2rem;
+  color: #fafcff;
+  text-shadow: 0px 0px 1px #000;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 400;
 }
 
 h3 {
   font-size: 26px;
-  color: #F25278;
+  color: #E82E81;
   font-weight: 800;
   margin-bottom: 0px;
+  margin-top: 0px;
+  border-bottom: 3px solid #2ee895;
+  width: fit-content;
+  padding: 0px 3px;
 }
 
 h4 {
   font-size: 20px;
-  color: #F25278;
-  font-weight: 800;
+  letter-spacing: 0.5;
+  color: #E82E81;
+  font-weight: 600;
   margin-bottom: 0px;
 }
 
+header {
+  position: sticky;
+  top: 0px;
+  z-index: 9999;
+}
+
 nav {
+  background-color: #E82E81;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 5px 20px;
   justify-content: space-between;
 }
@@ -49,13 +82,290 @@ ul.navBarUl {
 
 li {
   list-style-type: none;
-  color: black;
-  padding-right: 20px;
+  color: #fafcff;
+  padding-right: 30px;
+  font-weight: 400;
+  font-size: 17px;
 }
 
 a {
   text-decoration: none;
 }
+
+.scrollButton {
+  padding: 8px 20px;
+  background-color: #2ee895; 
+  color: #E82E81;
+  font-family: "DM Sans", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  border: #2ee895 3px solid;
+  border-radius: 6px;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
+  width: auto;
+  align-self: center;
+}
+
+/*Home Page*/
+
+.homepageBanner {
+  position: relative;
+  width: 100vw;
+}
+
+.bannerImg {
+  width: 100%;
+  max-height: 92vh;
+  object-fit: cover;
+  object-position: 0% 20%;
+  filter: brightness(40%);
+  z-index: 1;
+}
+
+.bannerText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 1;
+  color: #fafcff;
+  text-align: center;
+}
+
+.bannerText p {
+  font-size: 18px;
+}
+
+.howItWorks {
+  width: 70%;
+  height: 92vh;
+  margin-left: 15%;  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.howItWorks h3 {
+  margin: 0 auto;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  color: #fafcff;
+  margin-top: 80px;
+}
+
+.howItWorksFlex {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.stage1, .stage2, .stage3 {
+  background-color: #fafcff;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
+  width: 26%;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.stage1 img, .stage2 img, .stage3 img {
+  width: 50%;
+  margin-left: 25%;
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-right: 0px;
+}
+
+.howItWorksFlex p {
+  text-align: center;
+  font-size: 15px;
+  margin-top: 0px;
+}
+
+.howHeading {
+  font-weight: 700;
+  font-size: 1.4rem !important;
+  margin-bottom: 0px;
+}
+
+p.nextSteps {
+  width: 70%;
+  margin-left: 15%;
+  font-size: 18px;
+  text-align: center;
+  color: #fafcff;
+}
+
+.greenAccentBold {
+  font-weight: 700;
+  color: #2ee895;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.CTAContainer {
+  width: 70%;
+  height: 92vh;
+  margin-left: 15%;  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.CTAContainer h3 {
+  margin: 0 auto;
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  color: #fafcff;
+  margin-bottom: 10px;
+}
+
+p.CTAIntro {
+  text-align: center;
+  font-size: 18px;
+  color: #fafcff;
+  margin-bottom: 30px;
+}
+
+.CTA {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.CTAOption {
+  background-color: #fafcff;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
+  width: 36%;
+  padding: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  color: #000;
+}
+
+.CTAImage {
+  height: auto;         
+  max-height: 100px;    
+  width: auto;          
+  flex-shrink: 0;       
+}
+
+/*Get started page*/
+/* Container for the page */
+.get-started-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  font-family: "DM Sans", sans-serif; /* updated font */
+}
+
+/* Tab buttons container */
+.tab-buttons {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+/* Individual tab button */
+.tab-buttons button {
+  flex: 1;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  color: #555;
+  font-family: "DM Sans", sans-serif;
+}
+
+.tab-buttons button:hover {
+  background-color: #f5f5f5;
+}
+
+.tab-buttons button.active {
+  font-weight: bold;
+  border-bottom: 3px solid #E82E81;
+  color: #E82E81;
+  /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); */
+}
+
+/* Form container */
+form {
+  display: flex;
+  flex-direction: column;
+  font-family: "DM Sans", sans-serif; /* ensure consistent font */
+}
+
+/* Labels for inputs */
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* Add spacing between form fields */
+form > * + * {
+  margin-top: 1rem;
+}
+
+/* Form inputs */
+form input,
+form select,
+form textarea {
+  padding: 0.75rem 0.85rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Optional: group sections of fields */
+form .form-section {
+  margin-bottom: 1.5rem;
+}
+
+/* Submit buttons */
+form button {
+  padding: 0.75rem;
+  background-color: #2ee895;
+  color: #E82E81;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  font-family: "DM Sans", sans-serif;
+}
+
+form button:hover {
+  background-color: #2ee895;
+}
+
+/* Optional: small links (like "forgot password") */
+form small {
+  color: #888;
+  text-align: right;
+  cursor: pointer;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+
 
 /* Profile Setup Wizard */
 
