@@ -236,7 +236,7 @@ p.CTAIntro {
 }
 
 .CTAOption {
-  background-color: #fafcff;
+  background-color: #ffffff;
   box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
   width: 36%;
   padding: 20px;
@@ -654,13 +654,26 @@ img.roomIcon {
 
 /* roomie picks room listings */
 
+.roomiePicksIntro {
+  margin-top: 50px;
+  width: 60%;
+  margin-left: 20%;
+  margin-bottom: 40px;
+}
+
+.roomiePicksIntro p {
+  color: #FAFCFF;
+  font-weight: 600;
+  text-align: center;
+}
+
 .listingCard {
   width: 50%;
-  margin-left: 25%;
+  margin-left: 23%;
   background-color: #ffffff;
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0px 3px 8px rgba(0,0,0,0.3);;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
 }
 
 ul.listingUl {
@@ -669,10 +682,15 @@ ul.listingUl {
 
 li.listing {
   padding: 5px 0px;
+  color: #000;
 }
 
 .longDescription p {
   white-space: pre-wrap;
+}
+
+.rent {
+  margin-top: 20px;
 }
 
 /* 
@@ -695,10 +713,14 @@ li.listing {
   display: grid;
   grid-template-columns: 2fr 1fr; 
   grid-template-rows: 1fr 1fr;    
-  gap: 8px;
+  gap: 4px;
   max-width: 100%; 
   margin: 0 auto;
   height: auto; 
+}
+
+.photos img {
+  border-radius: 4px;
 }
 
 .photo-0 {
@@ -728,6 +750,8 @@ li.listing {
   aspect-ratio: 1 / 1;
 }
 
+
+
 .photos img:nth-child(n+4) {
   display: none; 
 }
@@ -752,7 +776,7 @@ li.listing {
   left:0;
   right:0;
   bottom:0;
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,0.8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -767,6 +791,8 @@ li.listing {
   flex-direction: column;
   justify-content: center;
   overflow: visible; 
+  background-color: #2EE895;
+  border-radius: 4px;
 }
 
 .carouselSlide {
@@ -797,23 +823,94 @@ li.listing {
   align-items: center;
 }
 
+button.slick-arrow.slick-next,
+button.slick-arrow.slick-prev {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10; 
+}
+
+button.slick-arrow.slick-next {
+  right: 10px;
+  opacity: 1 !important;
+}
+
+button.slick-arrow.slick-prev {
+  left: 10px;
+  opacity: 1 !important;
+}
+
+button.slick-arrow.slick-next::before {
+  content: '❯';
+  color: #E82E81;
+  font-size: 2rem;
+  font-weight: 800;
+  opacity: 1 !important;
+}
+
+button.slick-arrow.slick-prev::before {
+  content: '❮';
+  color: #E82E81;
+  font-size: 2rem;
+  font-weight: 800;
+  opacity: 1 !important;
+}
+
 
 .closeModalButton {
   position: absolute;
-  top: 10px;
+  top: 5px;
   right: 10px;
-  font-size: 1.5rem;
+  font-size: 2rem;
   background: none;
   border: none;
   cursor: pointer;
   z-index: 10;
+  color: #E82E81;
+  font-weight: 700;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7); /* semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* makes sure it sits on top */
+}
+
+.overlay-content {
+  position: relative;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 48%;
+  text-align: left;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-size: 2em;
+  color: #E82E81;
 }
 
 
 /* Like button */
 
 .likeButton {
-  background-color: #F25278;
+  background-color: #2EE895;
+  color: #E82E81;
   height: 70px;
   width: 70px;
   border-radius: 50%;
@@ -822,14 +919,14 @@ li.listing {
   justify-content: center;
   box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
   position: fixed;
-  right: 15vw;
+  right: 17vw;
   bottom: 20px;
   cursor: pointer;
 }
 
 .likeButton p {
-  font-size: 60px;
-  color: #ffffff;
+  font-size: 50px;
+  color: #E82E81;
 }
 
 .dislikeButton {
@@ -842,7 +939,7 @@ li.listing {
   justify-content: center;
   box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
   position: fixed;
-  left: 15vw;
+  left: 13vw;
   margin-left: 60px;
   bottom: 20px;
   cursor: pointer;
@@ -858,13 +955,17 @@ li.listing {
 .helpSheet {
   text-align: center;
   padding-top: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 16px;
   font-size: 14px;
-  color: grey;
+  font-weight: 500;
   cursor: pointer;
-  text-decoration: underline;
   width:fit-content;
   margin: 0 auto;
+}
+
+.helpSheet a {
+  color: #2EE895;
+  text-decoration: underline;
 }
 
 .helpSheet:hover {

@@ -3,6 +3,7 @@ import listingIcon from "../assets/listingIcon.png";
 import formIcon from "../assets/formIcon.png";
 import homeImage from "../assets/homeImage.jpg";
 import matchGraphic from "../assets/matchGraphic.jpg";
+import registerGraphic from "../assets/registerGraphic.jpg";
 
 function HomePage() {
     return (
@@ -56,7 +57,7 @@ function HomePage() {
                         <h4>Let's get started!</h4>
                         <p>Register and create your profile</p>
                     </div>
-                    <img className="CTAImage" src={matchGraphic} alt="illustration of computer screen with a heart in the middle"/>
+                    <img className="CTAImage" src={registerGraphic} alt="illustration of computer screen with a heart in the middle"/>
                 </a>
             </div>
             <a href="#" class="scrollButton">Back to top &#129053;</a>

@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 app.use(express.urlencoded({ extended: true }));
-app.use('/images', express.static(path.join(__dirname, 'app/public/images')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Add static files location
 app.use(express.static("static"));
