@@ -832,7 +832,9 @@ try {
               num_flatmates_max = ?,
               age_range_min = ?,
               age_range_max = ?,
-              description = ?
+              description = ?,
+              seeking_women_only_household = ?,
+              seeking_lgbtq_only_household = ?
             WHERE user_id = ?`,
             [
               step4.preferred_location || null,
@@ -846,15 +848,17 @@ try {
               step4.flatmates_age_min_preferred || null,
               step4.flatmates_age_max_preferred || null,
               step4.description || null,
+              step4.seekingWomenOnlyHomeYN === 'yes' ? 1 : 0,
+              step4.seekingLgbtqOnlyHomeYN === 'yes' ? 1 : 0,
               userId
             ]
           );
           await db.query(`DELETE FROM listing_photos WHERE flatmate_id = ?`, [flatmateId]);
         } else {
-          const [result] = await db.query(
+          const result = await db.query(
             `INSERT INTO flatmateListings
-              (user_id, location, budget_min, budget_max, move_in_date_min, move_in_date_max, stay_length, num_flatmates_min, num_flatmates_max, age_range_min, age_range_max, description)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              (user_id, location, budget_min, budget_max, move_in_date_min, move_in_date_max, stay_length, num_flatmates_min, num_flatmates_max, age_range_min, age_range_max, description, seeking_women_only_household, seeking_lgbtq_only_household)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               userId,
               step4.preferred_location || null,
@@ -867,7 +871,9 @@ try {
               step4.flatmates_max || null,
               step4.flatmates_age_min_preferred || null,
               step4.flatmates_age_max_preferred || null,
-              step4.description || null
+              step4.description || null,
+              step4.seekingWomenOnlyHomeYN === 'yes' ? 1 : 0,
+              step4.seekingLgbtqOnlyHomeYN === 'yes' ? 1 : 0
             ]
           );
           flatmateId = result.insertId;

@@ -25,6 +25,8 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
       flatmates_age_max_preferred: data.flatmates_age_max_preferred,
       womenOnlyHomeYN: data.womenOnlyHomeYN,
       lgbtqOnlyHomeYN: data.lgbtqOnlyHomeYN,
+      seekingWomenOnlyHomeYN: data.seekingWomenOnlyHomeYN,
+      seekingLgbtqOnlyHomeYN: data.seekingLgbtqOnlyHomeYN,
       description: data.description,
       photos: data.photos 
     };
@@ -32,151 +34,176 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmitStep4)}>
-      <h2>Create your ad</h2>
+    <div className='step4'>
+      <form onSubmit={handleSubmit(onSubmitStep4)}>
 
-      {/* Upload photos */}
-      <div>
-        <label>Upload photos (3-10)</label>
-        <input type="file" accept="image/*" multiple {...register('photos')} />
-      </div>
+        {/* Upload photos */}
+        <div>
+          <label>Upload photos (3-10)</label>
+          <input type="file" accept="image/*" multiple {...register('photos')} />
+        </div>
 
-      {/* Rent or Budget */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>How much is the rent?</label>
-            <input type="number" {...register('rent')} />
-          </>
-        ) : (
-          <>
-            <label>What is your budget?</label>
-            <input type="number" placeholder="Minimum (£)" {...register('budget_min')} />
-            <input type="number" placeholder="Maximum (£)" {...register('budget_max')} />
-          </>
-        )}
-      </div>
+        {/* Rent or Budget */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>How much is the rent?</label>
+              <input type="number" {...register('rent')} />
+            </>
+          ) : (
+            <>
+              <label>What is your budget?</label>
+              <div className="rangeGroup">
+                <input type="number" placeholder="Minimum (£)" {...register('budget_min')} />
+                <input type="number" placeholder="Maximum (£)" {...register('budget_max')} />
+              </div>
+            </>
+          )}
+        </div>
 
-      {/* Available / Move-in Date */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>When is the room available?</label>
-            <input type="date" {...register('available_date')} />
-          </>
-        ) : (
-          <>
-            <label>When do you need to move?</label>
-            <input type="date" placeholder="Earliest" {...register('move_in_min')} />
-            <input type="date" placeholder="Latest" {...register('move_in_max')} />
-          </>
-        )}
-      </div>
+        {/* Available / Move-in Date */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>When is the room available?</label>
+              <input type="date" {...register('available_date')} />
+            </>
+          ) : (
+            <>
+              <label>When do you need to move?</label>
+              <div className="rangeGroup">
+                <input type="date" placeholder="Earliest" {...register('move_in_min')} />
+                <input type="date" placeholder="Latest" {...register('move_in_max')} />
+              </div>
+            </>
+          )}
+        </div>
 
-      {/* Tenancy length / Stay length */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>How long is the tenancy?</label>
-            <input type="text" {...register('tenancy_length')} />
-          </>
-        ) : (
-          <>
-            <label>How long do you want to stay?</label>
-            <input type="number" placeholder="Months" {...register('stay_length')} />
-          </>
-        )}
-      </div>
+        {/* Tenancy length / Stay length */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>How long is the tenancy?</label>
+              <input type="text" {...register('tenancy_length')} />
+            </>
+          ) : (
+            <>
+              <label>How long do you want to stay?</label>
+              <input type="number" placeholder="Months" {...register('stay_length')} />
+            </>
+          )}
+        </div>
 
-      {/* Location */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>What's the location?</label>
-            <input type="text" {...register('location')} />
-          </>
-        ) : (
-          <>
-            <label>Where do you want to live?</label>
-            <input type="text" {...register('preferred_location')} />
-          </>
-        )}
-      </div>
+        {/* Location */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>What's the location?</label>
+              <input type="text" {...register('location')} />
+            </>
+          ) : (
+            <>
+              <label>Where do you want to live?</label>
+              <input type="text" {...register('preferred_location')} />
+            </>
+          )}
+        </div>
 
-      {/* Flatmates number */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>How many current flatmates are there?</label>
-            <input type="number" {...register('flatmates_current')} />
-          </>
-        ) : (
-          <>
-            <label>How many flatmates do you want?</label>
-            <input type="number" placeholder="Minimum" {...register('flatmates_min')} />
-            <input type="number" placeholder="Maximum" {...register('flatmates_max')} />
-          </>
-        )}
-      </div>
+        {/* Flatmates number */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>How many current flatmates are there?</label>
+              <input type="number" {...register('flatmates_current')} />
+            </>
+          ) : (
+            <>
+              <label>How many flatmates do you want?</label>
+              <div className="rangeGroup">
+                <input type="number" placeholder="Minimum" {...register('flatmates_min')} />
+                <input type="number" placeholder="Maximum" {...register('flatmates_max')} />
+              </div>
+            </>
+          )}
+        </div>
 
-      {/* Age range of flatmates */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>What is the age range of the current flatmates?</label>
-            <input type="number" placeholder="Youngest" {...register('flatmates_age_min')} />
-            <input type="number" placeholder="Oldest" {...register('flatmates_age_max')} />
-          </>
-        ) : (
-          <>
-            <label>What age range are you looking for?</label>
-            <input type="number" placeholder="Youngest" {...register('flatmates_age_min_preferred')} />
-            <input type="number" placeholder="Oldest" {...register('flatmates_age_max_preferred')} />
-          </>
-        )}
-      </div>
+        {/* Age range of flatmates */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>What is the age range of the current flatmates?</label>
+              <div className="rangeGroup">
+                <input type="number" placeholder="Youngest" {...register('flatmates_age_min')} />
+                <input type="number" placeholder="Oldest" {...register('flatmates_age_max')} />
+              </div>
+            </>
+          ) : (
+            <>
+              <label>What age range are you looking for?</label>
+              <div className="rangeGroup">
+                <input type="number" placeholder="Youngest" {...register('flatmates_age_min_preferred')} />
+                <input type="number" placeholder="Oldest" {...register('flatmates_age_max_preferred')} />
+              </div>
+            </>
+          )}
+        </div>
 
-      
+        
 
-      {/* Description */}
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>Tell us more about you, your current flatmates, and the room:</label>
-            <textarea {...register('description')} />
-          </>
-        ) : (
-          <>
-            <label>Tell us more about you and what you’re looking for:</label>
-            <textarea {...register('description')} />
-          </>
-        )}
-      </div>
+        {/* Description */}
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <label>Tell us more about you, your current flatmates, and the room:</label>
+              <textarea {...register('description')} />
+            </>
+          ) : (
+            <>
+              <label>Tell us more about you and what you’re looking for:</label>
+              <textarea {...register('description')} />
+            </>
+          )}
+        </div>
 
-      <div>
-        {listingType === 'hasRoom' ? (
-          <>
-            <label>Is your home a women-only home?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
-            <label>Is your home a lgbtq+ only home?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>
-          </>
-        ) : 
-        (
-          <></>
-        )}
-          </div>
+        <div>
+          {listingType === 'hasRoom' ? (
+            <>
+              <div className="inlineRadios">
+                <label>Is your home a women-only home?</label>
+                <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
+                <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
+              </div>
+              <div className="inlineRadios">
+                <label>Is your home a lgbtq+ only home?</label>
+                <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
+                <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="inlineRadios">
+                <label>Are you looking for a women-only home?</label>
+                <label className='horizontal'><input type="radio" value="yes" {...register('seekingWomenOnlyHomeYN')} /> Yes</label>
+                <label className='horizontal'><input type="radio" value="no" {...register('seekingWomenOnlyHomeYN')} /> No</label>
+              </div>
+              <div className="inlineRadios">
+                <label>Are you looking for a lgbtq+ only home?</label>
+                <label className='horizontal'><input type="radio" value="yes" {...register('seekingLgbtqOnlyHomeYN')} /> Yes</label>
+                <label className='horizontal'><input type="radio" value="no" {...register('seekingLgbtqOnlyHomeYN')} /> No</label>
+              </div>
+            </>
+          )}
+            </div>
 
-      {/* Navigation Buttons */}
-      <div style={{ marginTop: '1rem' }}>
-        <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>
-          Previous
-        </button>
-        <button type="submit">Next</button>
-      </div>
-    </form>
+        {/* Navigation Buttons */}
+        <div style={{ marginTop: '1rem' }}>
+          <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>
+            Previous
+          </button>
+          <button type="submit">Next</button>
+        </div>
+      </form>
+    </div>
   );
 }
 

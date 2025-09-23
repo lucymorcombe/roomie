@@ -82,16 +82,20 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
         </div>
 
         {/* Pets */}
-        <div className='horizontalField leftColumn'>
-          <label className='horizontal'>Do you have any pets?</label>
-          <label className='horizontal'><input type="radio" value="yes" {...register('pets', { required: true })} /> Yes</label>
-          <label className='horizontal'><input type="radio" value="no" {...register('pets', { required: true })} /> No</label>
+        <div className='horizontalField noHide'>
+          <div className='leftColumn'>
+            <label className='horizontal'>Do you have any pets?<span className='required'>*</span></label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('pets', { required: true })} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('pets', { required: true })} /> No</label>
+          </div>
         </div>
 
-        <div className='horizontalField leftColumn'>
-          <label className='horizontal'>Do you smoke or vape?</label>
-          <label className='horizontal'><input type="radio" value="yes" {...register('smokes', { required: true })} /> Yes</label>
-          <label className='horizontal'><input type="radio" value="no" {...register('smokes', { required: true })} /> No</label>
+        <div className='horizontalField noHide'>
+          <div className='leftColumn'>
+            <label className='horizontal'>Do you smoke or vape?<span className='required'>*</span></label>
+            <label className='horizontal'><input type="radio" value="yes" {...register('smokes', { required: true })} /> Yes</label>
+            <label className='horizontal'><input type="radio" value="no" {...register('smokes', { required: true })} /> No</label>
+          </div>
         </div>
 
         {/* Smoking/Vaping
@@ -158,7 +162,7 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
         </div>
 
         {/* Gender identity */}
-        <div className='horizontalField'>
+        {/* <div className='horizontalField'>
           <div className='leftColumn'>
             <label>What is your gender identity?</label>
             <label className='horizontal'><input type="radio" value="Woman" {...register('genderIdentity')} /> Woman</label>
@@ -167,6 +171,29 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
             <label className='horizontal'><input type="radio" value="Trans man" {...register('genderIdentity')} /> Trans man</label>
             <label className='horizontal'><input type="radio" value="Non-binary" {...register('genderIdentity')} /> Non-binary</label>
             <label className='horizontal'><input type="radio" value="Other" {...register('genderIdentity')} /> Other</label>
+          </div>
+          <div className='rightColumn'>
+            <label className='hideOption'>
+              <input type="checkbox" {...register('hideGenderIdentity')} />
+            </label>
+          </div>
+        </div> */}
+
+        <div className='horizontalField'>
+          <div className='leftColumn'>
+            <label className='horizontal textInput'>
+              What is your gender identity?
+              <select {...register('genderIdentity')}>
+                <option value="">Select...</option>
+                <option value="Woman">Woman</option>
+                <option value="Man">Man</option>
+                <option value="Trans woman">Trans woman</option>
+                <option value="Trans man">Trans man</option>
+                <option value="Non-binary">Non-binary</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </label>
           </div>
           <div className='rightColumn'>
             <label className='hideOption'>

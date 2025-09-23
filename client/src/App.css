@@ -69,6 +69,7 @@ nav {
   justify-content: center;
   padding: 5px 20px;
   justify-content: space-between;
+  box-shadow: 0px 2px 10px 2px rgba(5, 24, 95, 0.2);
 }
 
 nav img {
@@ -92,7 +93,7 @@ a {
   text-decoration: none;
 }
 
-.scrollButton {
+.scrollButton, .greenButton {
   padding: 8px 20px;
   background-color: #2ee895; 
   color: #E82E81;
@@ -256,7 +257,6 @@ p.CTAIntro {
 }
 
 /*Get started page*/
-/* Container for the page */
 .get-started-container {
   max-width: 400px;
   margin: 2rem auto;
@@ -265,17 +265,15 @@ p.CTAIntro {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  font-family: "DM Sans", sans-serif; /* updated font */
+  font-family: "DM Sans", sans-serif; 
 }
 
-/* Tab buttons container */
 .tab-buttons {
   display: flex;
   margin-bottom: 1.5rem;
   border-bottom: 2px solid #eee;
 }
 
-/* Individual tab button */
 .tab-buttons button {
   flex: 1;
   padding: 0.75rem 0;
@@ -296,17 +294,14 @@ p.CTAIntro {
   font-weight: bold;
   border-bottom: 3px solid #E82E81;
   color: #E82E81;
-  /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); */
 }
 
-/* Form container */
 form {
   display: flex;
   flex-direction: column;
-  font-family: "DM Sans", sans-serif; /* ensure consistent font */
+  font-family: "DM Sans", sans-serif; 
 }
 
-/* Labels for inputs */
 form label {
   display: block;
   margin-bottom: 0.5rem;
@@ -315,12 +310,10 @@ form label {
   font-size: 0.95rem;
 }
 
-/* Add spacing between form fields */
 form > * + * {
   margin-top: 1rem;
 }
 
-/* Form inputs */
 form input,
 form select,
 form textarea {
@@ -333,12 +326,10 @@ form textarea {
   font-family: "DM Sans", sans-serif;
 }
 
-/* Optional: group sections of fields */
 form .form-section {
   margin-bottom: 1.5rem;
 }
 
-/* Submit buttons */
 form button {
   padding: 0.75rem;
   background-color: #2ee895;
@@ -356,7 +347,6 @@ form button:hover {
   background-color: #2ee895;
 }
 
-/* Optional: small links (like "forgot password") */
 form small {
   color: #888;
   text-align: right;
@@ -368,97 +358,84 @@ form small {
 
 
 /* Profile Setup Wizard */
-
 .profileSetupPage {
-  width: 60vw;
-  margin-left: 20vw;
+  font-family: "DM Sans", sans-serif;
+  width: 100vw;
+  display: flex;
   margin-bottom: 0px;
 }
 
-.profileSetupPage h1 {
-  font-weight: 240;
+.stepHeading {
+  position: fixed;
+  left: 0;
+  width: 50vw;
+  height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepHeading h1 {
+  font-weight: 500;
+  font-size: 4.7rem;
   width: fit-content;
-  border-bottom: 3px solid #F25278;
+  margin-bottom: 30px;
+  padding: 20px;
+  
 }
 
 .profileSetupContainer {
-  background-color: #f5bbcc;
-  max-width: 60vw;
-  min-height: 50vh;
-  border-radius: 25px;
-  padding: 30px 70px;
+  margin-left: 50vw;
+  background-color: #FAFCFF;
+  max-width: 47vw;
+  min-height: 83vh;
+  padding: 30px 30px;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .profileSetupContainer h4 {
-  font-weight: 400;
-  margin-bottom: 10px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.profileSetupContainer p {
+  font-size: 15px;
+  font-weight: 500 !important;
+  margin: 0px;
 }
 
 .profileSetupContainer form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0px;
 }
 
 .profileSetupContainer label {
   display: flex;
   flex-direction: column;
-  grid-gap: 5px;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 15px;
 }
 
-p.stepIntro {
-  font-size: 16px !important;
+.profileSetupContainer input[type="text"],
+.profileSetupContainer input[type="number"],
+.profileSetupContainer input[type="date"],
+.profileSetupContainer select,
+.profileSetupContainer textarea {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
 }
 
-.hideNotice {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.hideNotice p {
-  text-align: center;
-  align-self: flex-end;
-}
-
-.stepTwo form {
-  padding-right: 20px;
-  padding-top: 14px;
-}
-
-.profileSetupContainer label.horizontal {
-  display: flex;
-  flex-direction: row;
-}
-
-.profileSetupContainer label.textInput {
-  display: flex;
-  flex-direction: row;
-  grid-gap: 25px;
-}
-
-.horizontalField {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-.leftColumn {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
-  row-gap: 5px;
-}
-
-.rightColumn {
-  width: 30px; /* or whatever works well visually */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.hideOption {
-  align-items: center;
+.profileSetupContainer textarea {
+  min-height: 80px;
+  resize: vertical;
 }
 
 .profileSetupContainer button {
@@ -473,19 +450,85 @@ p.stepIntro {
   cursor: pointer;
 }
 
-.profileSetupContainer p {
-  font-size: 13px;
-  margin: 0px;
+.profileSetupContainer input[type="file"] {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  background-color: #FAFCFF;
+  width: fit-content;
 }
 
-.stepTwo label {
+.profileSetupContainer input[type="file"]:hover {
+  border-color: #2EE895;
+  box-shadow: 0 0 5px rgba(46, 232, 149, 0.3);
+}
+
+.stepTwo .stepIntro {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.hideNotice {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 5px;
+}
+
+.hideNotice p {
+  text-align: center;
+  font-size: 12px;
+}
+
+.hideOption {
+  margin-right: 20px;
+}
+
+.horizontalField {
+  display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+
+.rightColumn {
+  display: flex;
+  align-items: center;
+}
+
+.horizontalField.noHide .leftColumn {
+  flex: 1; 
+}
+
+label.horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.required {
+  color: #E82E81;
+  margin-left: -7px;
 }
 
 .optionBoxContainer {
   display: flex;
   justify-content: center;
-  gap: 10%;
+  gap: 5%;
+  margin-bottom: 40px;
+  margin-top: 20px;
 }
 
 .optionBox {
@@ -494,15 +537,12 @@ p.stepIntro {
   justify-content: space-around;
   align-items: center;
   background-color: #ffffff;
-  width: 30%;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
+  width: 40%;
   aspect-ratio: 1/1;
-  color: #F25278;
+  color: #2EE895;
   border-radius: 10px;
-}
-
-.optionBox p {
-  font-size: 14px;
-  padding: 0px 25px;
+  padding: 10px;
   text-align: center;
 }
 
@@ -510,13 +550,107 @@ p.stepIntro {
   margin-top: 0px;
 }
 
+.optionBox p {
+  font-size: 14px;
+  padding: 0px 10px;
+  color: #000;
+}
+
 img.homeIcon {
-  width: 55%;
+  width: 85%;
 }
 
 img.roomIcon {
-  width: 55%;
+  width: 50%;
 }
+
+.step4 {
+  width: 48vw;
+}
+
+.stepFour label {
+  font-weight: 500;
+}
+
+.stepFour input,
+.stepFour select,
+.stepFour textarea {
+  margin-bottom: 10px;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+.stepFour input[type="file"] {
+  display: block;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  background-color: #FAFCFF;
+}
+
+.rangeGroup {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.rangeGroup input {
+  flex: 1;
+}
+
+.inlineRadios {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inlineRadios label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+
+.stepFive fieldset {
+  border: none;
+  padding: 0px;
+  margin-bottom: 15px;
+}
+
+.stepFive legend {
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.stepFive label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.profileComplete img {
+  width: 16%;
+  padding-bottom: 20px;
+}
+
+.profileComplete h1 {
+  color: #E82E81;
+  text-shadow: none;
+  font-size: 2rem;
+}
+
+.profileComplete p {
+  text-align: center;
+  padding-bottom: 30px;
+}
+
 
 /* roomie picks room listings */
 
@@ -559,21 +693,21 @@ li.listing {
 
 .photos {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* big image 2fr, right column 1fr */
-  grid-template-rows: 1fr 1fr;    /* two rows, each same height */
+  grid-template-columns: 2fr 1fr; 
+  grid-template-rows: 1fr 1fr;    
   gap: 8px;
-  max-width: 100%; /* or your preferred width */
+  max-width: 100%; 
   margin: 0 auto;
-  height: auto; /* fix container height to control squares */
+  height: auto; 
 }
 
 .photo-0 {
-  grid-column: 1 / 2;  /* first column */
-  grid-row: 1 / 3;     /* span both rows */
+  grid-column: 1 / 2;  
+  grid-row: 1 / 3;     
   width: 100%;
   height: 100%;
   object-fit: cover;
-  aspect-ratio: 1 / 1; /* keep it square */
+  aspect-ratio: 1 / 1; 
 }
 
 .photo-1 {
@@ -594,9 +728,8 @@ li.listing {
   aspect-ratio: 1 / 1;
 }
 
-/* Any extra photos after 3 can go full width below or be hidden */
 .photos img:nth-child(n+4) {
-  display: none; /* or style as you want */
+  display: none; 
 }
 
 .modal {
@@ -604,10 +737,10 @@ li.listing {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-height: 90vh;  /* limit height to 90% of viewport */
-  width: 90vw;       /* or whatever width you want */
+  max-height: 90vh;  
+  width: 90vw;      
   background: white;
-  overflow-y: auto;  /* enable vertical scrolling if content is too tall */
+  overflow-y: auto;  
   padding: 1rem;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   z-index: 1000;
@@ -633,7 +766,7 @@ li.listing {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: visible; /* important: allow arrows to appear outside if needed */
+  overflow: visible; 
 }
 
 .carouselSlide {
@@ -763,4 +896,3 @@ li.listing {
   margin-bottom: 0px;
   margin-top: 0px;
 }
-

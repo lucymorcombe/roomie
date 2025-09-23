@@ -77,33 +77,35 @@ function Step5Questionnaire({ onNext, formData, userId }) {
         <fieldset key={q.question_id}>
           <legend>{q.question_text}</legend>
 
-          {q.question_type === "multi_choice" &&
-            Array.isArray(q.options) && q.options.map((opt) => (
-              <label key={opt.question_options_id}>
-                <input
-                  type="checkbox"
-                  value={opt.question_options_id}
-                  {...register(`q${q.question_id}`)}
-                />
-                {opt.option_text}
-              </label>
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+            {q.question_type === "multi_choice" &&
+              Array.isArray(q.options) && q.options.map((opt) => (
+                <label key={opt.question_options_id}>
+                  <input
+                    type="checkbox"
+                    value={opt.question_options_id}
+                    {...register(`q${q.question_id}`)}
+                  />
+                  {opt.option_text}
+                </label>
+              ))}
 
-          {q.question_type === "single_choice" &&
-            Array.isArray(q.options) && q.options.map((opt) => (
-              <label key={opt.question_options_id}>
-                <input
-                  type="radio"
-                  value={opt.question_options_id}
-                  {...register(`q${q.question_id}`)}
-                />
-                {opt.option_text}
-              </label>
-            ))}
+            {q.question_type === "single_choice" &&
+              Array.isArray(q.options) && q.options.map((opt) => (
+                <label key={opt.question_options_id}>
+                  <input
+                    type="radio"
+                    value={opt.question_options_id}
+                    {...register(`q${q.question_id}`)}
+                  />
+                  {opt.option_text}
+                </label>
+              ))}
+            </div>
         </fieldset>
       ))}
 
-      <button type="submit">Next</button>
+      <button type="submit">Save & Submit</button>
     </form>
   );
 }
