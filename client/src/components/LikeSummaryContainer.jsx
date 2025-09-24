@@ -1,5 +1,6 @@
 // LikeSummaryContainer.js
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import MatchSummaryCard from "./MatchSummaryCard";
 
 function LikeSummaryContainer() {
@@ -18,7 +19,13 @@ function LikeSummaryContainer() {
     return (
         <div className="matchSummaryContainer">
             {listings.map(listing => (
+                <Link
+                    key={listing.listing_id}
+                    to={`/profile/${listing.userId}`}  
+                    className="match-link"
+                >
                 <MatchSummaryCard key={listing.listing_id} {...listing} />
+                </Link>
             ))}
         </div>
     )

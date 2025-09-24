@@ -172,7 +172,7 @@ button.logoutButton {
 .howItWorksFlex {
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: stretch;
 }
 
 .stage1, .stage2, .stage3 {
@@ -181,6 +181,8 @@ button.logoutButton {
   width: 26%;
   padding: 20px;
   border-radius: 4px;
+  justify-content: center;
+  align-content: center;
 }
 
 .stage1 img, .stage2 img, .stage3 img {
@@ -1066,26 +1068,76 @@ button.slick-arrow.slick-prev::before {
 
 /* matches page  */
 
+.matchSummaryContainer {
+  background-color: #FAFCFF;
+  border-radius: 6px;
+  box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2);
+  margin-bottom: 50px;
+  width: 60vw;
+  margin-left: 20vw;
+  padding: 5px 10px;
+  margin-top: 30px;
+  
+}
+
+
 .matchSummaryCard {
-  width: 70vw;
-  margin-left: 15vw;
+  width: 60vw;
+  /* margin-left: 20vw; */
+  /* background-color: #FAFCFF; */
   display: flex;
   align-items: center;
-  gap: 40px;
-  border-radius: 20px;
-  border: solid 1px rgba(0,0,0,0.5);
-  padding: 15px;
+  gap: 15px;
+  border-radius: 0px;
+  border-bottom: solid 2px #2EE895;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  /* padding: 5px 15px; */
 }
 
 .matchSummaryCard img {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   aspect-ratio: 1 / 1;
-  border-radius: 5px;
+  border-radius: 50%;
 }
 
 .matchSummaryCard p, .matchSummaryCard h4 {
   margin-bottom: 0px;
   margin-top: 0px;
+}
+.matchSummaryCard h4 {
+  font-size: 1.1rem;
+}
+
+.horizontalWrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+p.shortDesc {
+  width: 80%;
+}
+
+h4.rent {
+  background-color: #2EE895;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  padding: 0px 4px;
+  display: inline-block; /* so it only wraps the text */
+  clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+  height: fit-content;
+}
+
+h1.title {
+  margin-top: 50px;
+}
+
+p.matchedOn {
+  font-size: 13px;
+  padding-top: 5px;
+  padding-bottom: 2px;
+  color: #555;
 }

@@ -18,30 +18,32 @@ function MatchSummaryCard(props) {
                 <img src={`http://localhost:3000/images/${props.first_photo}`} alt="Listing photo" />
             </div>
             <div className="matchQuickInfo">
-                <h3>{props.first_name}</h3>
 
                 {props.rent !== undefined ? (
                     <>
+                        <div className="horizontalWrapper">
                         <h4>
-                            Property in {props.location}
+                            {props.first_name}'s property in {props.location}
                             {moveInDate ? `. Available from ${moveInDate}` : ''}
                         </h4>
-                        <h4>£{props.rent}pcm</h4>
-                        <p>{props.description?.slice(0, 200)}{props.description?.length > 200 ? "..." : ""}</p>
+                        <h4 className="rent">£{props.rent}pcm</h4>
+                        </div>
+                        <p className="shortDesc">{props.description?.slice(0, 150)}{props.description?.length > 200 ? "..." : ""}</p>
+                        
                     </>
                 ) : (
                     <>
                         <h4>
-                            Looking for property in {props.location}
+                            {props.first_name}: Looking for property in {props.location}
                             {moveInDate ? `. Needs to move: ${moveInDate}` : ''}
                         </h4>
                         <h4>Budget: up to £{props.budget_max}pcm</h4>
-                        <p>{props.description?.slice(0, 200)}{props.description?.length > 200 ? "..." : ""}</p>
+                        <p>{props.description?.slice(0, 150)}{props.description?.length > 200 ? "..." : ""}</p>
                     </>
                 )}
 
                 {props.matched_at && (
-                    <p>Matched on: {formatDate(props.matched_at) || 'TBC'}</p>
+                    <p className="matchedOn">Matched: {formatDate(props.matched_at) || 'TBC'}</p>
                 )}
             </div>
         </div>
