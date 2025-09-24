@@ -3,13 +3,12 @@ import RoomListingCard from "./RoomListingCard";
 import LikeButton from "./LikeButton";
 import DislikeButton from "./DislikeButton";
 
-function RoomListingsContainer() {
+function RoomListingsContainer({ onChangeListing }) { 
     const [listings, setListings] = React.useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0); //state for current index
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [listingType, setListingType] = useState(null);
     const [showOverlay, setShowOverlay] = useState(false);
     const fakeUserId = 1;
-
 
     React.useEffect(() => {
         const fetchListings = async () => {
@@ -35,23 +34,31 @@ function RoomListingsContainer() {
                 const listingsData = await listingsResponse.json();
                 console.log("Listings fetched:", listingsData);
                 setListings(listingsData);
-                
+
+                if (listingsData.length && onChangeListing) {
+                    onChangeListing(listingsData[0]);
+                }
+
             } catch (error) {
                 console.error("Error fetching Roomie Picks:", error)
             }
 
-            };
+        };
 
-            fetchListings();
-        }, []);
+        fetchListings();
+    }, [onChangeListing]);
 
+    useEffect(() => {
+        if (listings[currentIndex] && onChangeListing) {
+            onChangeListing(listings[currentIndex]);
+        }
+    }, [currentIndex, listings, onChangeListing]);
 
-///////this is my previous stuff from before. above is mya ttempt to fix.  im just not sure how to merge them
     function handleYes() {
         const currentListing = listings[currentIndex];
         console.log("Liked listing:", currentListing);
 
-        handleLike(currentListing.user_id, true); // Send like
+        handleLike(currentListing.user_id, true);
         setCurrentIndex(i => (i + 1 < listings.length ? i + 1 : i));
     }
 
@@ -59,7 +66,7 @@ function RoomListingsContainer() {
         const currentListing = listings[currentIndex];
         console.log("Disliked listing:", currentListing);
 
-        handleLike(currentListing.user_id, false); // Send dislike
+        handleLike(currentListing.user_id, false);
         setCurrentIndex(i => (i + 1 < listings.length ? i + 1 : i));
     }
 
@@ -80,19 +87,16 @@ function RoomListingsContainer() {
         }
     };
 
-    
     return (
         <>
         <div>
-            <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
+            {listings[currentIndex] && (
+                <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
+            )}
             <DislikeButton onClick={handleNo} />
             <LikeButton onClick={handleYes} />
-            {/* {listings.map(listing => (
-                <RoomListingCard key={listing.room_id} {...listing} />
-            ))}
-            <DislikeButton/>
-            <LikeButton/> */}
-                <div>
+
+            <div>
                 <p className="helpSheet">
                     <a href="#" onClick={(e) => { e.preventDefault(); setShowOverlay(true); }}>
                         How does this work?
@@ -105,7 +109,7 @@ function RoomListingsContainer() {
                             <button
                                 className="close-button"
                                 onClick={() => setShowOverlay(false)}
-                                >
+                            >
                                 ×
                             </button>
                             <h3>How does this work?</h3>
@@ -120,14 +124,13 @@ function RoomListingsContainer() {
                             <strong>On desktop:</strong> Use the heart to like, or the X to pass on a profile.
                             <br/><br/>
                             When you get a match, you’ll get a little notification. Check Likes for people who liked you, and Matches for all your matches.</p>
-                            </div>
-
+                        </div>
                     </div>
                 )}
-                </div>
+            </div>
         </div>
         </>
     )
 }
 
-export default RoomListingsContainer
+export default RoomListingsContainer;

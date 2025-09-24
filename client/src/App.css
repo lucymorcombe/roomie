@@ -1057,8 +1057,8 @@ button.slick-arrow.slick-prev::before {
 
 .profileListing {
   margin-top: 50px;
+  margin-bottom: 50px;
 }
-
 
 /* .profileListing .listingCard {
   margin-left: 23% !important;
