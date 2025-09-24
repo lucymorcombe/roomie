@@ -147,38 +147,6 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           </div>
         </div>
 
-        {/* LGBTQ+ housing preference – always shown */}
-        <div className='horizontalField'>
-          <div className='leftColumn'>
-            <label>Are you seeking an LGBTQ+ home/housemate?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqPreference')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('lgbtqPreference')} /> No</label>
-          </div>
-          <div className='rightColumn'>
-            <label className='hideOption'>
-              <input type="checkbox" {...register('hideLgbtqPreference')} />
-            </label>
-          </div>
-        </div>
-
-        {/* Gender identity */}
-        {/* <div className='horizontalField'>
-          <div className='leftColumn'>
-            <label>What is your gender identity?</label>
-            <label className='horizontal'><input type="radio" value="Woman" {...register('genderIdentity')} /> Woman</label>
-            <label className='horizontal'><input type="radio" value="Man" {...register('genderIdentity')} /> Man</label>
-            <label className='horizontal'><input type="radio" value="Trans woman" {...register('genderIdentity')} /> Trans woman</label>
-            <label className='horizontal'><input type="radio" value="Trans man" {...register('genderIdentity')} /> Trans man</label>
-            <label className='horizontal'><input type="radio" value="Non-binary" {...register('genderIdentity')} /> Non-binary</label>
-            <label className='horizontal'><input type="radio" value="Other" {...register('genderIdentity')} /> Other</label>
-          </div>
-          <div className='rightColumn'>
-            <label className='hideOption'>
-              <input type="checkbox" {...register('hideGenderIdentity')} />
-            </label>
-          </div>
-        </div> */}
-
         <div className='horizontalField'>
           <div className='leftColumn'>
             <label className='horizontal textInput'>
@@ -202,19 +170,6 @@ function Step2ProfileInfo({ onNext, onPrevious, defaultValues }) {
           </div>
         </div>
 
-        {/* Gender preference */}
-        <div className='horizontalField'>
-          <div className='leftColumn'>
-            <label>Are you seeking a women-only home/housemate?</label>
-            <label className='horizontal'><input type="radio" value="yes" {...register('genderPreference')} /> Yes</label>
-            <label className='horizontal'><input type="radio" value="no" {...register('genderPreference')} /> No</label>
-          </div>
-          <div className='rightColumn'>
-            <label className='hideOption'>
-              <input type="checkbox" {...register('hideGenderPreference')} />
-            </label>
-          </div>
-        </div>
 
         <div style={{ marginTop: '1rem' }}>
           <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>

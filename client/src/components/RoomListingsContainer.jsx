@@ -8,12 +8,30 @@ function RoomListingsContainer({ onChangeListing }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [listingType, setListingType] = useState(null);
     const [showOverlay, setShowOverlay] = useState(false);
-    const fakeUserId = 1;
+    const [currentUser, setCurrentUser] = useState(null);
+
+    // Fetch logged-in user session
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const res = await fetch('/api/session', { credentials: 'include' });
+                const data = await res.json();
+                if (data.loggedIn) {
+                    setCurrentUser({ id: data.userId });
+                }
+            } catch (err) {
+                console.error('Error fetching current user:', err);
+            }
+        };
+        fetchCurrentUser();
+    }, []);
 
     React.useEffect(() => {
+        if (!currentUser) return; // wait until current user is loaded
+
         const fetchListings = async () => {
             try{
-                const listingTypeResponse = await fetch(`/api/users/${fakeUserId}/listing-type`);
+                const listingTypeResponse = await fetch(`/api/users/${currentUser.id}/listing-type`, { credentials: 'include' });
                 const {listingType} = await listingTypeResponse.json();
 
                 setListingType(listingType);
@@ -27,7 +45,7 @@ function RoomListingsContainer({ onChangeListing }) {
                     throw new Error('Unknown listing type');
                 }
 
-                const listingsResponse = await fetch(listingUrl);
+                const listingsResponse = await fetch(listingUrl, { credentials: 'include' });
                 if (!listingsResponse.ok) {
                     throw new Error(`HTTP error! status: ${listingsResponse.status}`);
                 }
@@ -46,7 +64,7 @@ function RoomListingsContainer({ onChangeListing }) {
         };
 
         fetchListings();
-    }, [onChangeListing]);
+    }, [currentUser, onChangeListing]);
 
     useEffect(() => {
         if (listings[currentIndex] && onChangeListing) {
@@ -71,12 +89,13 @@ function RoomListingsContainer({ onChangeListing }) {
     }
 
     const handleLike = async (likedUserId, isLiked) => {
+        if (!currentUser) return; // safety check
         try {
             await fetch('/api/like', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    likerId: fakeUserId,
+                    likerId: currentUser.id,
                     likedUserId,
                     liked: isLiked,
                 }),
