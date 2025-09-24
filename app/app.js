@@ -396,6 +396,79 @@ app.get('/api/questions', async (req, res) => {
   }
 });
 
+// GET /api/users/:id/profile
+app.get('/api/users/:id/profile', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const sql = `
+      SELECT 
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.dob,
+        u.user_id,
+        p.bio,
+        p.profile_picture_url,
+        p.occupation,
+        p.occupation_visible,
+        p.student_status,
+        p.student_status_visible,
+        p.pet_owner,
+        p.smoker_status,
+        p.pronouns,
+        p.pronouns_visible,
+        p.lgbtq_identity,
+        p.lgbtq_identity_visible,
+        p.seeking_lgbtq_home,
+        p.seeking_lgbtq_home_visible,
+        p.gender_identity,
+        p.gender_identity_visible,
+        p.seeking_women_only_home,
+        p.seeking_women_only_home_visible
+      FROM users u
+      LEFT JOIN profiles p ON u.user_id = p.user_id
+      WHERE u.user_id = ?
+    `;
+
+    const result = await db.query(sql, [userId]);
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result[0];
+
+    res.json({
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      dob: user.dob,
+      userId: user.user_id,
+      bio: user.bio,
+      profilePicture: user.profile_picture_url,
+      occupation: user.occupation,
+      occupationVisible: user.occupation_visible,
+      studentStatus: user.student_status,
+      studentStatusVisible: user.student_status_visible,
+      petOwner: user.pet_owner,
+      smokerStatus: user.smoker_status,
+      pronouns: user.pronouns,
+      pronounsVisible: user.pronouns_visible,
+      lgbtqIdentity: user.lgbtq_identity,
+      lgbtqIdentityVisible: user.lgbtq_identity_visible,
+      seekingLgbtqHome: user.seeking_lgbtq_home,
+      seekingLgbtqHomeVisible: user.seeking_lgbtq_home_visible,
+      genderIdentity: user.gender_identity,
+      genderIdentityVisible: user.gender_identity_visible,
+      seekingWomenOnlyHome: user.seeking_women_only_home,
+      seekingWomenOnlyHomeVisible: user.seeking_women_only_home_visible
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Could not fetch user profile' });
+  }
+});
 
 
 

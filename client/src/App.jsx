@@ -71,6 +71,7 @@ function App() {
         <Route path="/likes" element={<Likes />} />
         <Route path="/matches" element={<Matches />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:userId" element={<Profile />} /> 
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />
       </Routes>
