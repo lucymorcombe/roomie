@@ -93,6 +93,20 @@ a {
   text-decoration: none;
 }
 
+button {
+  font-family: "DM Sans", sans-serif;
+}
+
+button.logoutButton {
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  padding: 5px 0px;
+  color: #fafcff;
+  font-weight: 400;
+  font-size: 17px;
+  cursor: pointer;
+}
+
 .scrollButton, .greenButton {
   padding: 8px 20px;
   background-color: #2ee895; 
