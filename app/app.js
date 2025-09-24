@@ -271,6 +271,7 @@ app.get('/api/matches', async (req, res) => {
                 'room' AS listing_type,
                 roomListings.location,
                 roomListings.rent,
+                roomListings.move_in_date_min,
                 roomListings.description,
                 users.first_name,
                 room_photos.room_photo_url AS first_photo,
@@ -297,6 +298,7 @@ app.get('/api/matches', async (req, res) => {
                 flatmateListings.flatmate_id AS listing_id,
                 'flatmate' AS listing_type,
                 flatmateListings.location,
+                flatmateListings.move_in_date_min,
                 NULL AS rent,
                 flatmateListings.description AS description,
                 users.first_name,
@@ -420,12 +422,8 @@ app.get('/api/users/:id/profile', async (req, res) => {
         p.pronouns_visible,
         p.lgbtq_identity,
         p.lgbtq_identity_visible,
-        p.seeking_lgbtq_home,
-        p.seeking_lgbtq_home_visible,
         p.gender_identity,
-        p.gender_identity_visible,
-        p.seeking_women_only_home,
-        p.seeking_women_only_home_visible
+        p.gender_identity_visible
       FROM users u
       LEFT JOIN profiles p ON u.user_id = p.user_id
       WHERE u.user_id = ?
@@ -457,12 +455,8 @@ app.get('/api/users/:id/profile', async (req, res) => {
       pronounsVisible: user.pronouns_visible,
       lgbtqIdentity: user.lgbtq_identity,
       lgbtqIdentityVisible: user.lgbtq_identity_visible,
-      seekingLgbtqHome: user.seeking_lgbtq_home,
-      seekingLgbtqHomeVisible: user.seeking_lgbtq_home_visible,
       genderIdentity: user.gender_identity,
       genderIdentityVisible: user.gender_identity_visible,
-      seekingWomenOnlyHome: user.seeking_women_only_home,
-      seekingWomenOnlyHomeVisible: user.seeking_women_only_home_visible
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
@@ -717,12 +711,8 @@ app.post('/api/profile-setup', async (req, res) => {
           pronouns_visible = ?,
           lgbtq_identity = ?, 
           lgbtq_identity_visible = ?, 
-          seeking_lgbtq_home = ?, 
-          seeking_lgbtq_home_visible = ?, 
           gender_identity = ?,
-          gender_identity_visible = ?,
-          seeking_women_only_home = ?,
-          seeking_women_only_home_visible = ?
+          gender_identity_visible = ?
         WHERE user_id = ?`,
         [
           step2.workStatus || null,
@@ -736,12 +726,8 @@ app.post('/api/profile-setup', async (req, res) => {
           step2.hidePronouns || null,
           step2.lgbtq || null,
           step2.hideLgbtq || null,
-          step2.lgbtqPreference || null,
-          step2.hideLgbtqPreference || null,
           step2.genderIdentity || null,
           step2.hideGenderIdentity || null,
-          step2.genderPreference || null,
-          step2.hideGenderPreference || null,
           userId
         ]
       );
@@ -751,10 +737,8 @@ app.post('/api/profile-setup', async (req, res) => {
         `INSERT INTO profiles 
         (user_id, bio, profile_picture_url, occupation, occupation_visible, student_status, student_status_visible, 
           pet_owner, smoker_status, pronouns, pronouns_visible, lgbtq_identity, 
-          lgbtq_identity_visible, seeking_lgbtq_home, seeking_lgbtq_home_visible, 
-          gender_identity, gender_identity_visible, seeking_women_only_home, 
-          seeking_women_only_home_visible) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          lgbtq_identity_visible, gender_identity, gender_identity_visible) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           userId,
           step1.bio || '',
@@ -770,12 +754,8 @@ app.post('/api/profile-setup', async (req, res) => {
           step2.hidePronouns || null,
           step2.lgbtq === 'yes' ? 1 : 0,
           step2.hideLgbtq || null,
-          step2.lgbtqPreference === 'yes' ? 1 : 0,
-          step2.hideLgbtqPreference || null,
           step2.genderIdentity || null,
-          step2.hideGenderIdentity || null,
-          step2.genderPreference === 'yes' ? 1 : 0,
-          step2.hideGenderPreference || null
+          step2.hideGenderIdentity || null
         ]
       );
     }

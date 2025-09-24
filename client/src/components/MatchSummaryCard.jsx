@@ -1,34 +1,51 @@
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-}
-
 function MatchSummaryCard(props) {
-    console.log("MatchSummaryCard props:", props);
+    const formatDate = (dateString) => {
+        if (!dateString) return null; // no date available
+        const date = new Date(dateString);
+        if (isNaN(date)) return null; // invalid date
+        return date.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    };
+
+    const moveInDate = formatDate(props.move_in_date_min);
+
     return (
         <div className="matchSummaryCard">
             <div className="matchImgAndPrice">
-            <img src={`http://localhost:3000/images/${props.first_photo}`} alt="Listing photo" />
+                <img src={`http://localhost:3000/images/${props.first_photo}`} alt="Listing photo" />
             </div>
-            {props.rent !== undefined ? (
-              <div className="matchQuickInfo">
-                <h4>Property in {props.location}. Available from {formatDate(props.move_in_date_min)}</h4>
-                <h4>£{props.rent}pcm</h4>
-                <p>{props.description.slice(0, 200)}{props.description.length > 200 ? "..." : ""}</p>
-              </div>
-            ) : (
-              <div className="matchQuickInfo">
-                <h4>Looking for property in {props.location}. Needs to move: {formatDate(props.move_in_date_min)}</h4>
-                <h4>Budget: up to £{props.budget_max}pcm</h4>
-                <p>{props.description.slice(0, 200)}{props.description.length > 200 ? "..." : ""}</p>
-              </div>
-            )}
-            <p>{formatDate(props.matched_at)}</p>
+            <div className="matchQuickInfo">
+                <h3>{props.first_name}</h3>
+
+                {props.rent !== undefined ? (
+                    <>
+                        <h4>
+                            Property in {props.location}
+                            {moveInDate ? `. Available from ${moveInDate}` : ''}
+                        </h4>
+                        <h4>£{props.rent}pcm</h4>
+                        <p>{props.description?.slice(0, 200)}{props.description?.length > 200 ? "..." : ""}</p>
+                    </>
+                ) : (
+                    <>
+                        <h4>
+                            Looking for property in {props.location}
+                            {moveInDate ? `. Needs to move: ${moveInDate}` : ''}
+                        </h4>
+                        <h4>Budget: up to £{props.budget_max}pcm</h4>
+                        <p>{props.description?.slice(0, 200)}{props.description?.length > 200 ? "..." : ""}</p>
+                    </>
+                )}
+
+                {props.matched_at && (
+                    <p>Matched on: {formatDate(props.matched_at) || 'TBC'}</p>
+                )}
+            </div>
         </div>
     )
 }
 
-export default MatchSummaryCard
+export default MatchSummaryCard;
