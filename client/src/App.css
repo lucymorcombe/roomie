@@ -1106,9 +1106,12 @@ button.slick-arrow.slick-prev::before {
 .matchSummaryCard p, .matchSummaryCard h4 {
   margin-bottom: 0px;
   margin-top: 0px;
+  text-decoration: none;
+  color: #000;
 }
 .matchSummaryCard h4 {
   font-size: 1.1rem;
+  color: #E82E81 !important;
 }
 
 .horizontalWrapper {
