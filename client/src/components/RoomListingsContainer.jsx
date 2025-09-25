@@ -45,7 +45,7 @@ function RoomListingsContainer({ onChangeListing }) {
                     throw new Error('Unknown listing type');
                 }
 
-                const listingsResponse = await fetch(listingUrl, { credentials: 'include' });
+                const listingsResponse = await fetch(listingUrl  + '?excludeSwiped=true', { credentials: 'include' });
                 if (!listingsResponse.ok) {
                     throw new Error(`HTTP error! status: ${listingsResponse.status}`);
                 }

@@ -23,7 +23,7 @@ export default function Profile() {
     async function fetchListing() {
       try {
         // Fetch room listings
-        const roomRes = await fetch('/api/room-listings', { credentials: 'include' });
+        const roomRes = await fetch(`/api/room-listings?excludeSwiped=false`, { credentials: 'include' });
         const roomData = roomRes.ok ? await roomRes.json() : [];
         const roomListing = Array.isArray(roomData) ? roomData.find(l => l.user_id === Number(userId)) : null;
 
@@ -33,7 +33,7 @@ export default function Profile() {
         }
 
         // Fetch flatmate listings
-        const flatmateRes = await fetch('/api/flatmate-listings', { credentials: 'include' });
+        const flatmateRes = await fetch('/api/flatmate-listings?excludeSwiped=false', { credentials: 'include' });
         const flatmateData = flatmateRes.ok ? await flatmateRes.json() : [];
         const flatmateListing = Array.isArray(flatmateData) ? flatmateData.find(l => l.user_id === Number(userId)) : null;
 

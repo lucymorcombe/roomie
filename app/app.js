@@ -45,18 +45,27 @@ app.get("/api/room-listings", async (req, res) => {
     const userId = req.session?.user_id;
     if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
+    const excludeSwiped = req.query.excludeSwiped === 'true';
     try {
-        const listings = await db.query(
-            `
-            SELECT * FROM roomListings
-            WHERE user_id != ? 
-            AND user_id NOT IN (
-                SELECT liked_id FROM user_likes
-                WHERE liker_id = ?
-            )
-            `,
-            [userId, userId]
-        );
+        let listings; // use let here
+        if (excludeSwiped) {
+            listings = await db.query(
+                `
+                SELECT * FROM roomListings
+                WHERE user_id != ? 
+                AND user_id NOT IN (
+                    SELECT liked_id FROM user_likes
+                    WHERE liker_id = ?
+                )
+                `,
+                [userId, userId]
+            );
+        } else {
+            listings = await db.query(
+                `SELECT * FROM roomListings WHERE user_id != ?`,
+                [userId]
+            );
+        }
 
         if (!listings.length) {
             console.log("No roomListings found");
@@ -64,19 +73,17 @@ app.get("/api/room-listings", async (req, res) => {
         }
 
         for (const listing of listings) {
-            console.log("Listing ID for photos query:", listing.room_id);
             const photos = await db.query(
                 "SELECT photo_url FROM listing_photos WHERE room_id = ?",
                 [listing.room_id]
             );
             listing.photos = photos.map(p => p.photo_url);
-            console.log("Mapped photo URLs:", listing.photos);
         }
 
         res.json(listings);
 
     } catch (error) {
-        console.error("Error fetching listing:", error);
+        console.error("Error fetching room listings:", error);
         res.status(500).json({ error: "Could not fetch listing" });
     }
 });
@@ -85,18 +92,27 @@ app.get("/api/flatmate-listings", async (req, res) => {
     const userId = req.session?.user_id;
     if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
+    const excludeSwiped = req.query.excludeSwiped === 'true';
     try {
-        const listings = await db.query(
-            `
-            SELECT * FROM flatmateListings
-            WHERE user_id != ? 
-            AND user_id NOT IN (
-                SELECT liked_id FROM user_likes
-                WHERE liker_id = ?
-            )
-            `,
-            [userId, userId]
-        );
+        let listings;
+        if (excludeSwiped) {
+            listings = await db.query(
+                `
+                SELECT * FROM flatmateListings
+                WHERE user_id != ? 
+                AND user_id NOT IN (
+                    SELECT liked_id FROM user_likes
+                    WHERE liker_id = ?
+                )
+                `,
+                [userId, userId]
+            );
+        } else {
+            listings = await db.query(
+                `SELECT * FROM flatmateListings WHERE user_id != ?`,
+                [userId]
+            );
+        }
 
         if (!listings.length) {
             console.log("No flatmateListings found");
@@ -104,22 +120,21 @@ app.get("/api/flatmate-listings", async (req, res) => {
         }
 
         for (const listing of listings) {
-            console.log("Listing ID for photos query:", listing.flatmate_id);
             const photos = await db.query(
                 "SELECT photo_url FROM listing_photos WHERE flatmate_id = ?",
                 [listing.flatmate_id]
             );
             listing.photos = photos.map(p => p.photo_url);
-            console.log("Mapped photo URLs:", listing.photos);
         }
 
         res.json(listings);
 
     } catch (error) {
-        console.error("Error fetching listing:", error);
+        console.error("Error fetching flatmate listings:", error);
         res.status(500).json({ error: "Could not fetch listing" });
     }
 });
+
 
 app.get('/api/users/:id/listing-type', async (req, res) => {
   const userId = req.session?.user_id;
