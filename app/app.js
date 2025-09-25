@@ -266,58 +266,60 @@ app.get('/api/matches', async (req, res) => {
     try {
         const matches = await db.query(
             `
-            SELECT
-                roomListings.room_id AS listing_id,
-                'room' AS listing_type,
-                roomListings.location,
-                roomListings.rent,
-                roomListings.move_in_date_min,
-                roomListings.description,
-                users.first_name,
-                room_photos.room_photo_url AS first_photo,
-                user_matches.matched_at
-            FROM user_matches
-            JOIN users 
-                ON (users.user_id = user_matches.user1_id OR users.user_id = user_matches.user2_id)
-                AND users.user_id != ?
-            JOIN roomListings 
-                ON roomListings.user_id = users.user_id
-            LEFT JOIN (
-                SELECT room_id, MIN(photo_url) AS room_photo_url
-                FROM listing_photos
-                WHERE photo_url LIKE '%bedroom%'
-                GROUP BY room_id
-            ) AS room_photos 
-                ON room_photos.room_id = roomListings.room_id
-            WHERE user_matches.user1_id = ? OR user_matches.user2_id = ?
+          SELECT
+              roomListings.room_id AS listing_id,
+              'room' AS listing_type,
+              users.user_id AS userId,
+              roomListings.location,
+              roomListings.rent,
+              roomListings.move_in_date_min,
+              roomListings.description,
+              users.first_name,
+              room_photos.room_photo_url AS first_photo,
+              user_matches.matched_at
+          FROM user_matches
+          JOIN users 
+              ON (users.user_id = user_matches.user1_id OR users.user_id = user_matches.user2_id)
+              AND users.user_id != ?
+          JOIN roomListings 
+              ON roomListings.user_id = users.user_id
+          LEFT JOIN (
+              SELECT room_id, MIN(photo_url) AS room_photo_url
+              FROM listing_photos
+              WHERE photo_url LIKE '%bedroom%'
+              GROUP BY room_id
+          ) AS room_photos 
+              ON room_photos.room_id = roomListings.room_id
+          WHERE user_matches.user1_id = ? OR user_matches.user2_id = ?
 
-            UNION ALL
+          UNION ALL
 
-            -- Matched user's flatmate listing (if they are looking for a room)
-            SELECT
-                flatmateListings.flatmate_id AS listing_id,
-                'flatmate' AS listing_type,
-                flatmateListings.location,
-                flatmateListings.move_in_date_min,
-                NULL AS rent,
-                flatmateListings.description AS description,
-                users.first_name,
-                flatmate_photos.flatmate_photo_url AS first_photo,
-                user_matches.matched_at
-            FROM user_matches
-            JOIN users 
-                ON (users.user_id = user_matches.user1_id OR users.user_id = user_matches.user2_id)
-                AND users.user_id != ?
-            JOIN flatmateListings 
-                ON flatmateListings.user_id = users.user_id
-            LEFT JOIN (
-                SELECT flatmate_id, MIN(photo_url) AS flatmate_photo_url
-                FROM listing_photos
-                WHERE photo_url LIKE '%roomieListing%' AND photo_url LIKE '%_1%'
-                GROUP BY flatmate_id
-            ) AS flatmate_photos 
-                ON flatmate_photos.flatmate_id = flatmateListings.flatmate_id
-            WHERE user_matches.user1_id = ? OR user_matches.user2_id = ?
+          SELECT
+              flatmateListings.flatmate_id AS listing_id,
+              'flatmate' AS listing_type,
+              users.user_id AS userId,
+              flatmateListings.location,
+              NULL AS rent,
+              flatmateListings.move_in_date_min,
+              flatmateListings.description,
+              users.first_name,
+              flatmate_photos.flatmate_photo_url AS first_photo,
+              user_matches.matched_at
+          FROM user_matches
+          JOIN users 
+              ON (users.user_id = user_matches.user1_id OR users.user_id = user_matches.user2_id)
+              AND users.user_id != ?
+          JOIN flatmateListings 
+              ON flatmateListings.user_id = users.user_id
+          LEFT JOIN (
+              SELECT flatmate_id, MIN(photo_url) AS flatmate_photo_url
+              FROM listing_photos
+              WHERE photo_url LIKE '%roomieListing%' AND photo_url LIKE '%_1%'
+              GROUP BY flatmate_id
+          ) AS flatmate_photos 
+              ON flatmate_photos.flatmate_id = flatmateListings.flatmate_id
+          WHERE user_matches.user1_id = ? OR user_matches.user2_id = ?
+
             `,
             [
                 userId, userId, userId,
@@ -580,6 +582,8 @@ app.post('/api/set-password', async function (req, res) {
     res.status(500).json({ success: false, error: 'Server error during registration' });
   }
 });
+
+
 
 
 // Check submitted email and password pair

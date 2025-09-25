@@ -19,9 +19,10 @@ function LikeSummaryContainer() {
     return (
         <div className="matchSummaryContainer">
             {listings.map(listing => (
+                console.log('Link userId:', listing.user_id, 'Listing object:', listing),
                 <Link
-                    key={listing.listing_id}
-                    to={`/profile/${listing.userId}`}  
+                    key={listing.user_id}
+                    to={`/profile/${listing.user_id}`}  
                     className="match-link"
                 >
                 <MatchSummaryCard key={listing.listing_id} {...listing} />

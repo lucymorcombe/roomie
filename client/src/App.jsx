@@ -47,7 +47,7 @@ function App() {
                 <Link to="/roomie-picks"><li>Roomie Picks</li></Link>
                 <Link to="/likes"><li>Likes</li></Link>
                 <Link to="/matches"><li>Matches</li></Link>
-                <Link to="/profile"><li>Profile</li></Link>
+                <Link to={`/profile/${session.userId}`}><li>Profile</li></Link>
                 <li><LogoutButton /></li>  {/* Added logout button here */}
               </ul>
             </>
@@ -70,7 +70,7 @@ function App() {
         <Route path="/roomie-picks" element={<RoomiePicks />} />
         <Route path="/likes" element={<Likes />} />
         <Route path="/matches" element={<Matches />} />
-        <Route path="/profile" element={<Profile />} />
+        {/* <Route path="/profile" element={<Profile />} /> */}
         <Route path="/profile/:userId" element={<Profile />} /> 
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />

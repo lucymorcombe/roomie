@@ -60,7 +60,7 @@ function HomePage() {
                     <img className="CTAImage" src={registerGraphic} alt="illustration of computer screen with a heart in the middle"/>
                 </a>
             </div>
-            <a href="#" class="scrollButton">Back to top &#129053;</a>
+            <a href="#" className="scrollButton">Back to top &#129053;</a>
         </div>
         </>
     )
