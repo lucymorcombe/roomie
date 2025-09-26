@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@use-gesture/react": "^10.3.1",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
@@ -21,8 +22,10 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.62.0",
+    "react-responsive": "^10.0.1",
     "react-router-dom": "^7.6.3",
     "react-slick": "^0.30.3",
+    "react-spring": "^10.0.3",
     "slick-carousel": "^1.8.1",
     "sqlite3": "^5.0.2",
     "supervisor": "^0.12.0"

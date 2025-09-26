@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import RoomListingCard from "./RoomListingCard";
 import LikeButton from "./LikeButton";
 import DislikeButton from "./DislikeButton";
+import { useMediaQuery } from "react-responsive";
+import SwipeStack from "./SwipeStack";
 
 function RoomListingsContainer({ onChangeListing }) { 
-    const [listings, setListings] = React.useState([]);
+    const [listings, setListings] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [listingType, setListingType] = useState(null);
     const [showOverlay, setShowOverlay] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+
+    // Media query must be inside the component
+    const isMobile = useMediaQuery({ maxWidth: 768 });
 
     // Fetch logged-in user session
     useEffect(() => {
@@ -26,70 +31,58 @@ function RoomListingsContainer({ onChangeListing }) {
         fetchCurrentUser();
     }, []);
 
-    React.useEffect(() => {
-        if (!currentUser) return; // wait until current user is loaded
+    // Fetch listings based on current user
+    useEffect(() => {
+        if (!currentUser) return;
 
         const fetchListings = async () => {
-            try{
+            try {
                 const listingTypeResponse = await fetch(`/api/users/${currentUser.id}/listing-type`, { credentials: 'include' });
-                const {listingType} = await listingTypeResponse.json();
+                const { listingType } = await listingTypeResponse.json();
 
                 setListingType(listingType);
 
                 let listingUrl = '';
-                if (listingType === 'hasRoom') {
-                    listingUrl = '/api/flatmate-listings';
-                } else if (listingType === 'needsRoom') {
-                    listingUrl = '/api/room-listings';
-                } else {
-                    throw new Error('Unknown listing type');
-                }
+                if (listingType === 'hasRoom') listingUrl = '/api/flatmate-listings';
+                else if (listingType === 'needsRoom') listingUrl = '/api/room-listings';
+                else throw new Error('Unknown listing type');
 
-                const listingsResponse = await fetch(listingUrl  + '?excludeSwiped=true', { credentials: 'include' });
-                if (!listingsResponse.ok) {
-                    throw new Error(`HTTP error! status: ${listingsResponse.status}`);
-                }
+                const listingsResponse = await fetch(listingUrl + '?excludeSwiped=true', { credentials: 'include' });
+                if (!listingsResponse.ok) throw new Error(`HTTP error! status: ${listingsResponse.status}`);
+
                 const listingsData = await listingsResponse.json();
-                console.log("Listings fetched:", listingsData);
                 setListings(listingsData);
 
-                if (listingsData.length && onChangeListing) {
-                    onChangeListing(listingsData[0]);
-                }
-
+                if (listingsData.length && onChangeListing) onChangeListing(listingsData[0]);
             } catch (error) {
                 console.error("Error fetching Roomie Picks:", error)
             }
-
         };
 
         fetchListings();
     }, [currentUser, onChangeListing]);
 
+    // Update the current listing when index changes
     useEffect(() => {
         if (listings[currentIndex] && onChangeListing) {
             onChangeListing(listings[currentIndex]);
         }
     }, [currentIndex, listings, onChangeListing]);
 
-    function handleYes() {
+    const handleYes = () => {
         const currentListing = listings[currentIndex];
-        console.log("Liked listing:", currentListing);
-
         handleLike(currentListing.user_id, true);
         setCurrentIndex(i => (i + 1 < listings.length ? i + 1 : i));
-    }
+    };
 
-    function handleNo() {
+    const handleNo = () => {
         const currentListing = listings[currentIndex];
-        console.log("Disliked listing:", currentListing);
-
         handleLike(currentListing.user_id, false);
         setCurrentIndex(i => (i + 1 < listings.length ? i + 1 : i));
-    }
+    };
 
     const handleLike = async (likedUserId, isLiked) => {
-        if (!currentUser) return; // safety check
+        if (!currentUser) return;
         try {
             await fetch('/api/like', {
                 method: 'POST',
@@ -100,7 +93,6 @@ function RoomListingsContainer({ onChangeListing }) {
                     liked: isLiked,
                 }),
             });
-            console.log(`Sent ${isLiked ? "like" : "dislike"} for user ${likedUserId}`);
         } catch (err) {
             console.error('Error saving like:', err);
         }
@@ -108,12 +100,23 @@ function RoomListingsContainer({ onChangeListing }) {
 
     return (
         <>
-        <div>
-            {listings[currentIndex] && (
-                <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
-            )}
-            <DislikeButton onClick={handleNo} />
-            <LikeButton onClick={handleYes} />
+            <div>
+                {isMobile ? (
+                    <SwipeStack
+                        listings={listings}
+                        onLike={(listing) => handleLike(listing.user_id, true)}
+                        onDislike={(listing) => handleLike(listing.user_id, false)}
+                    />
+                ) : (
+                    <>
+                        {listings[currentIndex] && (
+                            <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
+                        )}
+                        <DislikeButton onClick={handleNo} />
+                        <LikeButton onClick={handleYes} />
+                    </>
+                )}
+            </div>
 
             <div>
                 <p className="helpSheet">
@@ -132,24 +135,25 @@ function RoomListingsContainer({ onChangeListing }) {
                                 ×
                             </button>
                             <h3>How does this work?</h3>
-                            <p>These are the profiles our algorithm thinks could be your ideal flatmates. Maybe you both love making friends, maybe you’re happy just waving hello in the kitchen—whatever your vibe, we’ve got you covered.
-                            <br/><br/>
-                            You’ll also see some less compatible matches, but don’t worry, we’ll never show anyone in your dealbreaker categories.
-                            <br/><br/>
-                            Swipe left, swipe right… looks familiar, right? Don’t worry, no awkward first dates here.
-                            <br/><br/>
-                            <strong>On mobile:</strong> Tap a listing for more info, then swipe right if you like them or left if not.
-                            <br/>
-                            <strong>On desktop:</strong> Use the heart to like, or the X to pass on a profile.
-                            <br/><br/>
-                            When you get a match, you’ll get a little notification. Check Likes for people who liked you, and Matches for all your matches.</p>
+                            <p>
+                                These are the profiles our algorithm thinks could be your ideal flatmates. Maybe you both love making friends, maybe you’re happy just waving hello in the kitchen—whatever your vibe, we’ve got you covered.
+                                <br /><br />
+                                You’ll also see some less compatible matches, but don’t worry, we’ll never show anyone in your dealbreaker categories.
+                                <br /><br />
+                                Swipe left, swipe right… looks familiar, right? Don’t worry, no awkward first dates here.
+                                <br /><br />
+                                <strong>On mobile:</strong> Tap a listing for more info, then swipe right if you like them or left if not.
+                                <br />
+                                <strong>On desktop:</strong> Use the heart to like, or the X to pass on a profile.
+                                <br /><br />
+                                When you get a match, you’ll get a little notification. Check Likes for people who liked you, and Matches for all your matches.
+                            </p>
                         </div>
                     </div>
                 )}
             </div>
-        </div>
         </>
-    )
+    );
 }
 
 export default RoomListingsContainer;
