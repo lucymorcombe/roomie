@@ -4,6 +4,8 @@ import path from "path";
 import cors from "cors";
 import session from "express-session";
 import { fileURLToPath } from "url";
+import multer from 'multer';
+import fs from 'fs';
 
 // Get __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -37,7 +39,87 @@ app.use(session({
   }
 }));
 
+////upload photo stuff
 
+// Create uploads directory if it doesn't exist
+const uploadDir = path.join(__dirname, 'public', 'images', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Create unique filename: timestamp + random number + original extension
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
+
+// File filter for images only
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit per file
+  }
+});
+
+// Single image upload endpoint (for profile pictures)
+app.post('/api/upload-image', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    // Return the relative URL path that can be used in your app
+    const imageUrl = `/images/uploads/${req.file.filename}`;
+    res.json({ success: true, imageUrl: imageUrl });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
+// Multiple images upload endpoint (for listing photos)
+app.post('/api/upload-images', upload.array('images', 10), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+    
+    // Return array of image URLs
+    const imageUrls = req.files.map(file => `/images/uploads/${file.filename}`);
+    res.json({ success: true, imageUrls: imageUrls });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
+// Error handling middleware for multer
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File too large' });
+    }
+    if (error.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({ error: 'Too many files' });
+    }
+  }
+  next(error);
+});
 
 // const SIMULATED_USER_ID = 1;
 
@@ -46,8 +128,10 @@ app.get("/api/room-listings", async (req, res) => {
     if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
     const excludeSwiped = req.query.excludeSwiped === 'true';
+    const includeOwn = req.query.includeOwn === 'true';  // Add this parameter
+    
     try {
-        let listings; // use let here
+        let listings;
         if (excludeSwiped) {
             listings = await db.query(
                 `
@@ -61,10 +145,16 @@ app.get("/api/room-listings", async (req, res) => {
                 [userId, userId]
             );
         } else {
-            listings = await db.query(
-                `SELECT * FROM roomListings WHERE user_id != ?`,
-                [userId]
-            );
+            if (includeOwn) {
+                // For profile pages - get ALL listings including user's own
+                listings = await db.query(`SELECT * FROM roomListings`);
+            } else {
+                // For main browsing - exclude user's own listings
+                listings = await db.query(
+                    `SELECT * FROM roomListings WHERE user_id != ?`,
+                    [userId]
+                );
+            }
         }
 
         if (!listings.length) {
@@ -93,6 +183,8 @@ app.get("/api/flatmate-listings", async (req, res) => {
     if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
     const excludeSwiped = req.query.excludeSwiped === 'true';
+    const includeOwn = req.query.includeOwn === 'true';  // Add this parameter
+    
     try {
         let listings;
         if (excludeSwiped) {
@@ -108,10 +200,16 @@ app.get("/api/flatmate-listings", async (req, res) => {
                 [userId, userId]
             );
         } else {
-            listings = await db.query(
-                `SELECT * FROM flatmateListings WHERE user_id != ?`,
-                [userId]
-            );
+            if (includeOwn) {
+                // For profile pages - get ALL listings including user's own
+                listings = await db.query(`SELECT * FROM flatmateListings`);
+            } else {
+                // For main browsing - exclude user's own listings
+                listings = await db.query(
+                    `SELECT * FROM flatmateListings WHERE user_id != ?`,
+                    [userId]
+                );
+            }
         }
 
         if (!listings.length) {
@@ -134,7 +232,6 @@ app.get("/api/flatmate-listings", async (req, res) => {
         res.status(500).json({ error: "Could not fetch listing" });
     }
 });
-
 
 app.get('/api/users/:id/listing-type', async (req, res) => {
   const userId = req.session?.user_id;
@@ -875,13 +972,15 @@ try {
           roomId = result.insertId;
         }
 
-        // if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
-        //   throw new Error("You must submit between 3 and 10 photos.");
-        // }
-        // const photoInserts = step4.photos.map(photoUrl =>
-        //   db.query(`INSERT INTO listing_photos (room_id, photo_url) VALUES (?, ?)`, [roomId, photoUrl])
-        // );
-        // await Promise.all(photoInserts);
+        if (step4.photos && Array.isArray(step4.photos) && step4.photos.length > 0) {
+          if (step4.photos.length < 3 || step4.photos.length > 10) {
+            throw new Error("You must submit between 3 and 10 photos.");
+          }
+          const photoInserts = step4.photos.map(photoUrl =>
+            db.query(`INSERT INTO listing_photos (room_id, photo_url) VALUES (?, ?)`, [roomId, photoUrl])
+          );
+          await Promise.all(photoInserts);
+        }
 
       } else if (step4.listingType === 'needsRoom') {
         const existing = await db.query(
@@ -951,13 +1050,15 @@ try {
           flatmateId = result.insertId;
         }
 
-        // if (!step4.photos || step4.photos.length < 3 || step4.photos.length > 10) {
-        //   throw new Error("You must submit between 3 and 10 photos.");
-        // }
-        // const photoInserts = step4.photos.map(photoUrl =>
-        //   db.query(`INSERT INTO listing_photos (flatmate_id, photo_url) VALUES (?, ?)`, [flatmateId, photoUrl])
-        // );
-        // await Promise.all(photoInserts);
+        if (step4.photos && Array.isArray(step4.photos) && step4.photos.length > 0) {
+          if (step4.photos.length < 3 || step4.photos.length > 10) {
+            throw new Error("You must submit between 3 and 10 photos.");
+          }
+          const photoInserts = step4.photos.map(photoUrl =>
+            db.query(`INSERT INTO listing_photos (flatmate_id, photo_url) VALUES (?, ?)`, [flatmateId, photoUrl])
+          );
+          await Promise.all(photoInserts);
+        }
       }
     }
 

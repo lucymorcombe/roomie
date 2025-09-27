@@ -37,7 +37,7 @@ function RoomListingCard(props) {
         {(props.photos || []).map((url, i) => (
           <img
             key={i}
-            src={`http://localhost:3000/images/${url}`}
+            src={`http://localhost:3000${url}`}
             alt={`Photo ${i + 1}`}
             className={`photo photo-${i}`}
             style={i === 2 ? { cursor: 'pointer' } : {}}
@@ -101,7 +101,7 @@ function RoomListingCard(props) {
               {(props.photos || []).map((url, i) => (
                 <div key={i} className="carouselSlide">
                   <img
-                    src={`http://localhost:3000/images/${url}`}
+                    src={`http://localhost:3000${url}`}
                     alt={`Photo ${i + 1}`}
                   />
                 </div>

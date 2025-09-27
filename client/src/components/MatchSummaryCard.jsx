@@ -15,7 +15,7 @@ function MatchSummaryCard(props) {
     return (
         <div className="matchSummaryCard">
             <div className="matchImgAndPrice">
-                <img src={`http://localhost:3000/images/${props.first_photo}`} alt="Listing photo" />
+                <img src={`http://localhost:3000${props.first_photo}`} alt="Listing photo" />
             </div>
             <div className="matchQuickInfo">
 

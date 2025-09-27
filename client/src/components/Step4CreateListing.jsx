@@ -1,36 +1,95 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, userId }) {
-  const { register, handleSubmit } = useForm({ defaultValues });
+  const { register, handleSubmit, watch } = useForm({ defaultValues });
+  const [photoPreviews, setPhotoPreviews] = useState(defaultValues?.photos || []);
+  const [uploading, setUploading] = useState(false);
 
-  const onSubmitStep4 = (data) => {
-    const step4Data = {
-      listingType: listingType, // Include listing type from props
-      rent: data.rent,
-      budget_min: data.budget_min,
-      budget_max: data.budget_max,
-      available_date: data.available_date,
-      move_in_min: data.move_in_min,
-      move_in_max: data.move_in_max,
-      tenancy_length: data.tenancy_length,
-      stay_length: data.stay_length,
-      location: data.location,
-      preferred_location: data.preferred_location,
-      flatmates_current: data.flatmates_current,
-      flatmates_min: data.flatmates_min,
-      flatmates_max: data.flatmates_max,
-      flatmates_age_min: data.flatmates_age_min,
-      flatmates_age_max: data.flatmates_age_max,
-      flatmates_age_min_preferred: data.flatmates_age_min_preferred,
-      flatmates_age_max_preferred: data.flatmates_age_max_preferred,
-      womenOnlyHomeYN: data.womenOnlyHomeYN,
-      lgbtqOnlyHomeYN: data.lgbtqOnlyHomeYN,
-      seekingWomenOnlyHomeYN: data.seekingWomenOnlyHomeYN,
-      seekingLgbtqOnlyHomeYN: data.seekingLgbtqOnlyHomeYN,
-      description: data.description,
-      photos: data.photos 
-    };
-    onNext(step4Data);
+  // Handle multiple photo previews
+  const handlePhotoChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Create preview URLs
+    const previews = [];
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previews.push(e.target.result);
+        if (previews.length === files.length) {
+          setPhotoPreviews(previews);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Remove a photo from previews
+  const removePhoto = (indexToRemove) => {
+    setPhotoPreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const onSubmitStep4 = async (data) => {
+    setUploading(true);
+    
+    try {
+      let photoUrls = defaultValues?.photos || [];
+
+      // Upload new photos if selected
+      if (data.photos?.length > 0) {
+        const formData = new FormData();
+        Array.from(data.photos).forEach(file => {
+          formData.append('images', file);
+        });
+
+        const response = await fetch('/api/upload-images', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || 'Upload failed');
+        }
+
+        photoUrls = result.imageUrls;
+      }
+
+      const step4Data = {
+        listingType: listingType,
+        rent: data.rent,
+        budget_min: data.budget_min,
+        budget_max: data.budget_max,
+        available_date: data.available_date,
+        move_in_min: data.move_in_min,
+        move_in_max: data.move_in_max,
+        tenancy_length: data.tenancy_length,
+        stay_length: data.stay_length,
+        location: data.location,
+        preferred_location: data.preferred_location,
+        flatmates_current: data.flatmates_current,
+        flatmates_min: data.flatmates_min,
+        flatmates_max: data.flatmates_max,
+        flatmates_age_min: data.flatmates_age_min,
+        flatmates_age_max: data.flatmates_age_max,
+        flatmates_age_min_preferred: data.flatmates_age_min_preferred,
+        flatmates_age_max_preferred: data.flatmates_age_max_preferred,
+        womenOnlyHomeYN: data.womenOnlyHomeYN,
+        lgbtqOnlyHomeYN: data.lgbtqOnlyHomeYN,
+        seekingWomenOnlyHomeYN: data.seekingWomenOnlyHomeYN,
+        seekingLgbtqOnlyHomeYN: data.seekingLgbtqOnlyHomeYN,
+        description: data.description,
+        photos: photoUrls
+      };
+      
+      onNext(step4Data);
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload images. Please try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -40,7 +99,56 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         {/* Upload photos */}
         <div>
           <label>Upload photos (3-10)</label>
-          <input type="file" accept="image/*" multiple {...register('photos')} />
+          <input 
+            type="file" 
+            accept="image/*" 
+            multiple 
+            {...register('photos')} 
+            onChange={handlePhotoChange}
+          />
+          
+          {/* Photo previews */}
+          {photoPreviews.length > 0 && (
+            <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {photoPreviews.map((preview, index) => (
+                <div key={index} style={{ position: 'relative' }}>
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      objectFit: 'cover',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(index)}
+                    style={{
+                      position: 'absolute',
+                      top: '-5px',
+                      right: '-5px',
+                      background: '#2ee895',
+                      color: '#E82E81',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '20px',
+                      height: '20px',
+                      fontSize: '16px',
+                      fontWeight:'800',
+                      paddingLeft:'0px',
+                      paddingRight:'0px',
+                      paddingTop:'0px',
+                      paddingBottom:'23px'
+                    }}
+                  >
+                    -
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Rent or Budget */}
@@ -148,8 +256,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        
-
         {/* Description */}
         <div>
           {listingType === 'hasRoom' ? (
@@ -159,7 +265,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
             </>
           ) : (
             <>
-              <label>Tell us more about you and what you’re looking for:</label>
+              <label>Tell us more about you and what you're looking for:</label>
               <textarea {...register('description')} />
             </>
           )}
@@ -193,14 +299,16 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
               </div>
             </>
           )}
-            </div>
+        </div>
 
         {/* Navigation Buttons */}
         <div style={{ marginTop: '1rem' }}>
           <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>
             Previous
           </button>
-          <button type="submit">Next</button>
+          <button type="submit" disabled={uploading}>
+            {uploading ? 'Uploading...' : 'Next'}
+          </button>
         </div>
       </form>
     </div>

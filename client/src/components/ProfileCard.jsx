@@ -22,7 +22,7 @@ function ProfileCard(props) {
     <div className="profileCard">
       {props.profilePicture && (
         <img
-          src={`http://localhost:3000/images/${props.profilePicture}`}
+          src={`http://localhost:3000${props.profilePicture}`}
           alt={`${props.firstName}'s profile`}
           className="profilePicture"
         />

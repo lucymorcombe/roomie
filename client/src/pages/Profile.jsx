@@ -22,8 +22,8 @@ export default function Profile() {
 
     async function fetchListing() {
       try {
-        // Fetch room listings
-        const roomRes = await fetch(`/api/room-listings?excludeSwiped=false`, { credentials: 'include' });
+        // Fetch room listings with includeOwn parameter
+        const roomRes = await fetch(`/api/room-listings?includeOwn=true`, { credentials: 'include' });
         const roomData = roomRes.ok ? await roomRes.json() : [];
         const roomListing = Array.isArray(roomData) ? roomData.find(l => l.user_id === Number(userId)) : null;
 
@@ -32,8 +32,8 @@ export default function Profile() {
           return;
         }
 
-        // Fetch flatmate listings
-        const flatmateRes = await fetch('/api/flatmate-listings?excludeSwiped=false', { credentials: 'include' });
+        // Fetch flatmate listings with includeOwn parameter
+        const flatmateRes = await fetch('/api/flatmate-listings?includeOwn=true', { credentials: 'include' });
         const flatmateData = flatmateRes.ok ? await flatmateRes.json() : [];
         const flatmateListing = Array.isArray(flatmateData) ? flatmateData.find(l => l.user_id === Number(userId)) : null;
 
@@ -53,6 +53,7 @@ export default function Profile() {
   }, [userId]);
 
   if (!user) return <p>Loading user...</p>;
+  
   return (
     <div className='profileListing'>
       <h1>{user.first_name} {user.last_name}</h1>
