@@ -18,9 +18,6 @@ function formatAgeRange(min, max) {
 function RoomListingCard(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  console.log("Photos received:", props.photos);
-  console.log("Photos array for listing:", props.photos);
-  console.log("RoomListingCard props.photos:", props.photos);
 
   const openModal = (index) => {
     setCurrentIndex(index);
@@ -34,16 +31,33 @@ function RoomListingCard(props) {
   return (
     <div className="listingCard">
       <div className="photos">
-        {(props.photos || []).map((url, i) => (
-          <img
-            key={i}
-            src={`http://localhost:3000${url}`}
-            alt={`Photo ${i + 1}`}
-            className={`photo photo-${i}`}
-            style={i === 2 ? { cursor: 'pointer' } : {}}
-            onClick={i === 2 ? () => openModal(i) : undefined}
-          />
-        ))}
+        {(props.photos || []).map((url, i) => {
+          if (i === 2 && props.photos.length > 3) {
+            return (
+              <div 
+                key={i} 
+                className="photo photo-2 see-more"
+                style={{ cursor: 'pointer' }}
+                onClick={() => openModal(i)}
+              >
+                <img
+                  src={`http://localhost:3000${url}`}
+                  alt={`Photo ${i + 1}`}
+                />
+                <span className="see-more-text">See more</span>
+              </div>
+            );
+          }
+
+          return (
+            <img
+              key={i}
+              src={`http://localhost:3000${url}`}
+              alt={`Photo ${i + 1}`}
+              className={`photo photo-${i}`}
+            />
+          );
+        })}
       </div>
 
       <div className="rent">
@@ -73,7 +87,6 @@ function RoomListingCard(props) {
             </li>
           )}
 
-          
           <li className="listing">
             <strong>Women only household:</strong> {props.women_only_household === 1 ? 'Yes' : 'No'}
           </li>
@@ -110,9 +123,7 @@ function RoomListingCard(props) {
           </div>
         </div>
       )}
-      
     </div>
-    
   );
 }
 
