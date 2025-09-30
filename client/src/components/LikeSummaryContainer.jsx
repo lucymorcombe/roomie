@@ -1,4 +1,3 @@
-// LikeSummaryContainer.js
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import MatchSummaryCard from "./MatchSummaryCard";
@@ -45,7 +44,6 @@ function LikeSummaryContainer() {
             });
             if (!res.ok) throw new Error("Failed to save like");
 
-            // Remove listing from view since it becomes a match
             setListings(prev => prev.filter(l => l.user_id !== likedUserId));
         } catch (err) {
             console.error("Error liking user:", err);

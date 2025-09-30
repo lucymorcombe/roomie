@@ -1185,23 +1185,14 @@ p.matchedOn {
 }
 
 .like-card-wrapper .likeButton {
-  background-color: #2EE895;
-  color: #E82E81;
   height: 50px;
   width: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
   position: relative;
   right: 0px;
   bottom: 0px;
   margin-left: 20px;
-  cursor: pointer;
 }
 
 .like-card-wrapper .likeButton p {
   font-size: 40px;
-  color: #E82E81;
 }
