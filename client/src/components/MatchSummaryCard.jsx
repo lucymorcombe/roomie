@@ -1,8 +1,8 @@
 function MatchSummaryCard(props) {
     const formatDate = (dateString) => {
-        if (!dateString) return null; // no date available
+        if (!dateString) return null; 
         const date = new Date(dateString);
-        if (isNaN(date)) return null; // invalid date
+        if (isNaN(date)) return null; 
         return date.toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'long',
@@ -19,7 +19,7 @@ function MatchSummaryCard(props) {
             </div>
             <div className="matchQuickInfo">
 
-                {props.rent !== undefined ? (
+                {props.rent !== undefined && props.rent !== null ? (
                     <>
                         <div className="horizontalWrapper">
                         <h4>
@@ -34,10 +34,10 @@ function MatchSummaryCard(props) {
                 ) : (
                     <>
                         <h4>
-                            {props.first_name}: Looking for property in {props.location}
-                            {moveInDate ? `. Needs to move: ${moveInDate}` : ''}
+                            {props.first_name}'s looking for property in {props.location}
+                            {moveInDate ? ` from ${moveInDate}` : ''}
                         </h4>
-                        <h4>Budget: up to £{props.budget_max}pcm</h4>
+                        {/* <p className="budget">Max budget: £{props.budget_max}pcm</p> */}
                         <p>{props.description?.slice(0, 150)}{props.description?.length > 200 ? "..." : ""}</p>
                     </>
                 )}

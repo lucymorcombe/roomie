@@ -142,9 +142,15 @@ app.get("/api/room-listings", async (req, res) => {
         AND user_id NOT IN (
           SELECT liked_id FROM user_likes WHERE liker_id = ?
         )
+        AND user_id NOT IN (
+          SELECT CASE WHEN user1_id = ? THEN user2_id ELSE user1_id END
+          FROM user_matches
+          WHERE user1_id = ? OR user2_id = ?
+        )
         `,
-        [userId, userId]
+        [userId, userId, userId, userId, userId]
       );
+
     } else {
       if (includeOwn) {
         listings = await db.query(`SELECT * FROM roomListings`);
@@ -243,9 +249,16 @@ app.get("/api/flatmate-listings", async (req, res) => {
         AND user_id NOT IN (
           SELECT liked_id FROM user_likes WHERE liker_id = ?
         )
+        AND user_id NOT IN (
+          SELECT CASE WHEN user1_id = ? THEN user2_id ELSE user1_id END
+          FROM user_matches
+          WHERE user1_id = ? OR user2_id = ?
+        )
         `,
-        [userId, userId]
+        [userId, userId, userId, userId, userId]
       );
+
+
     } else {
       if (includeOwn) {
         listings = await db.query(`SELECT * FROM flatmateListings`);
@@ -314,7 +327,6 @@ app.post('/api/like', async (req, res) => {
   const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
-
   const { likerId, likedUserId, liked } = req.body;
   if (!likerId || !likedUserId || typeof liked !== 'boolean') {
     console.log('Bad request: missing or invalid data');
@@ -328,25 +340,24 @@ app.post('/api/like', async (req, res) => {
       [likerId, likedUserId, liked, liked]
     );
 
-  let isMatch = false;
+    let isMatch = false;
 
-  if (liked) {
-    console.log('Checking if reciprocal like exists...');
-    const [existing] = await db.query(
-      'SELECT liked FROM user_likes WHERE liker_id = ? AND liked_id = ? AND liked = TRUE',
-      [likedUserId, likerId]
-    );
-    console.log('Reciprocal like query result:', existing);
+    if (liked) {
+      console.log('Checking if reciprocal like exists...');
+      const [existing] = await db.query(
+        'SELECT liked FROM user_likes WHERE liker_id = ? AND liked_id = ? AND liked = TRUE',
+        [likedUserId, likerId]
+      );
+      console.log('Reciprocal like query result:', existing);
 
-    if (existing) {
+      if (existing) {
         isMatch = true;
         console.log('Match found! Creating/updating user_matches...');
 
         const user1_id = likerId < likedUserId ? likerId : likedUserId;
         const user2_id = likerId < likedUserId ? likedUserId : likerId;
 
-        
-       const [rows] = await db.query(
+        const [rows] = await db.query(
           `SELECT GREATEST(
             (SELECT created_at FROM user_likes WHERE liker_id = ? AND liked_id = ?),
             (SELECT created_at FROM user_likes WHERE liker_id = ? AND liked_id = ?)
@@ -360,8 +371,6 @@ app.post('/api/like', async (req, res) => {
 
         console.log('Latest like timestamp:', max_created_at);
 
-        
-
         await db.query(
           `INSERT INTO user_matches (user1_id, user2_id, matched_at)
            VALUES (?, ?, ?)
@@ -369,21 +378,29 @@ app.post('/api/like', async (req, res) => {
           [user1_id, user2_id, max_created_at]
         );
         console.log('user_matches updated/inserted');
-        } else {
-          console.log('No reciprocal like found yet.');
-        }
+
+        await db.query(
+          `DELETE FROM user_likes 
+           WHERE (liker_id = ? AND liked_id = ?) 
+              OR (liker_id = ? AND liked_id = ?)`,
+          [likerId, likedUserId, likedUserId, likerId]
+        );
+        console.log('Likes deleted after match');
+
+      } else {
+        console.log('No reciprocal like found yet.');
       }
-    
+    }
 
     return res.status(200).json({
       message: 'Like recorded',
       match: isMatch
     });
 
-    } catch (error) {
-      console.error('Error saving like or match:', error);
-      return res.status(500).json({ error: 'Could not record like or match' });
-    }
+  } catch (error) {
+    console.error('Error saving like or match:', error);
+    return res.status(500).json({ error: 'Could not record like or match' });
+  }
 });
 
 
@@ -393,30 +410,66 @@ app.get('/api/likes', async (req, res) => {
 
   try {
     console.log('Getting likes for user', userId);
-    const likes = await db.query(
-      `SELECT
-        roomListings.*,
-        users.first_name,
-        listing_photos.photo_url AS first_photo,
-        user_likes.created_at
-      FROM user_likes
-      JOIN users 
-        ON users.user_id = user_likes.liker_id
-      JOIN roomListings 
-        ON roomListings.user_id = users.user_id
-      LEFT JOIN (
-        SELECT room_id, MIN(photo_url) AS photo_url
-        FROM listing_photos
-        WHERE photo_url LIKE '%bedroom%'
-        GROUP BY room_id
-      ) AS listing_photos 
-        ON listing_photos.room_id = roomListings.room_id
-      WHERE user_likes.liked_id = ?`,
+
+    const flatmateCheck = await db.query(
+      `SELECT flatmate_id FROM flatmateListings WHERE user_id = ?`,
       [userId]
     );
-    console.log('Likes query result:', likes);
 
-    res.json(likes);
+    if (flatmateCheck.length > 0) {
+
+      const likes = await db.query(
+        `SELECT
+          roomListings.*,
+          users.first_name,
+          listing_photos.photo_url AS first_photo,
+          user_likes.created_at
+        FROM user_likes
+        JOIN users 
+          ON users.user_id = user_likes.liker_id
+        JOIN roomListings 
+          ON roomListings.user_id = users.user_id
+        LEFT JOIN (
+          SELECT room_id, MIN(photo_url) AS photo_url
+          FROM listing_photos
+          GROUP BY room_id
+        ) AS listing_photos 
+          ON listing_photos.room_id = roomListings.room_id
+        WHERE user_likes.liked_id = ?`,
+        [userId]
+      );
+      console.log('Likes query result:', likes);
+
+      res.json(likes);
+
+    } else {
+      
+        const likes = await db.query(
+          `SELECT
+            flatmateListings.*,
+            users.first_name,
+            listing_photos.photo_url AS first_photo,
+            user_likes.created_at
+          FROM user_likes
+          JOIN users 
+            ON users.user_id = user_likes.liker_id
+          JOIN flatmateListings 
+            ON flatmateListings.user_id = users.user_id
+          LEFT JOIN (
+            SELECT flatmate_id, MIN(photo_url) AS photo_url
+            FROM listing_photos
+            GROUP BY flatmate_id
+          ) AS listing_photos 
+            ON listing_photos.flatmate_id = flatmateListings.flatmate_id
+          WHERE user_likes.liked_id = ?`,
+          [userId]
+        );
+        console.log('Likes query result:', likes);
+
+        res.json(likes);
+    }
+
+
     } catch (error) {
       console.error("Error fetching likes:", error);
       res.status(500).json({ error: "Could not fetch likes" });
