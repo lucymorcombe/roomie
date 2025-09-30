@@ -14,7 +14,7 @@ function HomePage() {
         <h1> Welcome to Roomie!</h1>
         <h2>Find your perfect flatmate.</h2>
             <p>Tired of messy housemates, late rent, or totally clashing lifestyles? Roomie makes finding your ideal flatmate or room simple, fun, and stress-free. Whether you’re looking for a room or offering one, we match you with people who actually get your vibe.</p><br/><br/>
-            <a href="#howItWorks" class="scrollButton">See how it works &#129055;</a>
+            <a href="#howItWorks" className="scrollButton">See how it works &#129055;</a>
         </div>
         </div>
         <div className="howItWorks" id="howItWorks">
@@ -38,7 +38,7 @@ function HomePage() {
             </div>
             <br/>
             <p className="nextSteps">Then, once your profile and listing are ready, you can start browsing compatible users and find your perfect match - <span className="greenAccentBold">no more awkward living situations or wasted viewings.</span></p><br/>
-            <a href="#CTAContainer" class="scrollButton">Get started &#129055;</a>
+            <a href="#CTAContainer" className="scrollButton">Get started &#129055;</a>
             
         </div>
         <div className="CTAContainer" id="CTAContainer">
