@@ -6,11 +6,9 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
   const [photoPreviews, setPhotoPreviews] = useState(defaultValues?.photos || []);
   const [uploading, setUploading] = useState(false);
 
-  // Handle multiple photo previews
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
     
-    // Create preview URLs
     const previews = [];
     files.forEach(file => {
       const reader = new FileReader();
@@ -24,7 +22,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
     });
   };
 
-  // Remove a photo from previews
   const removePhoto = (indexToRemove) => {
     setPhotoPreviews(prev => prev.filter((_, index) => index !== indexToRemove));
   };
@@ -35,7 +32,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
     try {
       let photoUrls = defaultValues?.photos || [];
 
-      // Upload new photos if selected
       if (data.photos?.length > 0) {
         const formData = new FormData();
         Array.from(data.photos).forEach(file => {
@@ -75,6 +71,8 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         flatmates_age_max: data.flatmates_age_max,
         flatmates_age_min_preferred: data.flatmates_age_min_preferred,
         flatmates_age_max_preferred: data.flatmates_age_max_preferred,
+        petsAccepted: data.petsAccepted,
+        openToPets: data.openToPets,
         womenOnlyHomeYN: data.womenOnlyHomeYN,
         lgbtqOnlyHomeYN: data.lgbtqOnlyHomeYN,
         seekingWomenOnlyHomeYN: data.seekingWomenOnlyHomeYN,
@@ -96,7 +94,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
     <div className='step4'>
       <form onSubmit={handleSubmit(onSubmitStep4)}>
 
-        {/* Upload photos */}
         <div>
           <label>Upload photos (3-10)</label>
           <input 
@@ -107,7 +104,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
             onChange={handlePhotoChange}
           />
           
-          {/* Photo previews */}
           {photoPreviews.length > 0 && (
             <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {photoPreviews.map((preview, index) => (
@@ -151,7 +147,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Rent or Budget */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -169,7 +164,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Available / Move-in Date */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -187,7 +181,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Tenancy length / Stay length */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -202,7 +195,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Location */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -217,7 +209,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Flatmates number */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -235,7 +226,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Age range of flatmates */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -256,7 +246,6 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Description */}
         <div>
           {listingType === 'hasRoom' ? (
             <>
@@ -275,6 +264,11 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           {listingType === 'hasRoom' ? (
             <>
               <div className="inlineRadios">
+                <label>Does your home accept pets?</label>
+                <label className='horizontal'><input type="radio" value="yes" {...register('petsAccepted')} /> Yes</label>
+                <label className='horizontal'><input type="radio" value="no" {...register('petsAccepted')} /> No</label>
+              </div>
+              <div className="inlineRadios">
                 <label>Is your home a women-only home?</label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
@@ -287,6 +281,11 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
             </>
           ) : (
             <>
+              <div className="inlineRadios">
+                <label>Are you happy to live with pets?</label>
+                <label className='horizontal'><input type="radio" value="yes" {...register('openToPets')} /> Yes</label>
+                <label className='horizontal'><input type="radio" value="no" {...register('openToPets')} /> No</label>
+              </div>
               <div className="inlineRadios">
                 <label>Are you looking for a women-only home?</label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('seekingWomenOnlyHomeYN')} /> Yes</label>
@@ -301,7 +300,8 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           )}
         </div>
 
-        {/* Navigation Buttons */}
+        
+
         <div style={{ marginTop: '1rem' }}>
           <button type="button" onClick={onPrevious} style={{ marginRight: '1rem' }}>
             Previous

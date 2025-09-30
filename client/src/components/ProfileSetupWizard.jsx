@@ -14,36 +14,18 @@ function ProfileSetupWizard() {
   const [isComplete, setIsComplete] = useState(false);
   const userId = session.userId;
 
-  // Handle step data without sending to backend
   const handleStepData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }));
 
     if (step < 5) {
       setStep((prev) => prev + 1);
     } else {
-      // Only send to backend when all steps are complete
       submitCompleteProfile({ ...formData, ...newData });
     }
   };
 
-  // Send all profile data to backend at once
   const submitCompleteProfile = async (completeData) => {
-    // In submitCompleteProfile function, right before the fetch:
-    console.log('Complete data being sent:', {
-      step1: {
-        bio: completeData.bio,
-        profilePictureUrl: completeData.profilePictureUrl
-      },
-      step2: {
-        workStatus: completeData.workStatus,
-        // ... etc
-      },
-      step4: {
-        listingType: completeData.listingType,
-        // ... etc
-      },
-      step5: completeData.step5
-    });
+   
     if (!userId) return;
 
     try {
@@ -94,6 +76,8 @@ function ProfileSetupWizard() {
             flatmates_age_max: completeData.flatmates_age_max,
             flatmates_age_min_preferred: completeData.flatmates_age_min_preferred,
             flatmates_age_max_preferred: completeData.flatmates_age_max_preferred,
+            petsAccepted: completeData.petsAccepted,
+            openToPets: completeData.openToPets,
             womenOnlyHomeYN: completeData.womenOnlyHomeYN,
             lgbtqOnlyHomeYN: completeData.lgbtqOnlyHomeYN,
             seekingWomenOnlyHomeYN: completeData.seekingWomenOnlyHomeYN,
@@ -213,6 +197,8 @@ function ProfileSetupWizard() {
               flatmates_age_max: formData.flatmates_age_max,
               flatmates_age_min_preferred: formData.flatmates_age_min_preferred,
               flatmates_age_max_preferred: formData.flatmates_age_max_preferred,
+              petsAccepted: formData.petsAccepted,
+              openToPets: formData.openToPets,
               womenOnlyHomeYN: formData.womenOnlyHomeYN,
               lgbtqOnlyHomeYN: formData.lgbtqOnlyHomeYN,
               seekingWomenOnlyHomeYN: formData.seekingWomenOnlyHomeYN,
