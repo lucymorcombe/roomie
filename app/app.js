@@ -1,4 +1,3 @@
-// Import express.js
 import express from "express";
 import path from "path";
 import cors from "cors";
@@ -7,12 +6,12 @@ import { fileURLToPath } from "url";
 import multer from 'multer';
 import fs from 'fs';
 
-// Get __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import db from './services/db.js';
 import { User } from "./models/user.js";
+import calculateCompatibilityScore from "./utils/calculateCompatibilityScore.js";
 
 const app = express();
 
@@ -24,7 +23,6 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// Add static files location
 app.use(express.static("static"));
 
 app.use(express.json());
@@ -39,27 +37,21 @@ app.use(session({
   }
 }));
 
-////upload photo stuff
-
-// Create uploads directory if it doesn't exist
 const uploadDir = path.join(__dirname, 'public', 'images', 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // Create unique filename: timestamp + random number + original extension
     const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
     cb(null, uniqueName);
   }
 });
 
-// File filter for images only
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -72,18 +64,16 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit per file
+    fileSize: 5 * 1024 * 1024 
   }
 });
 
-// Single image upload endpoint (for profile pictures)
 app.post('/api/upload-image', upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
     
-    // Return the relative URL path that can be used in your app
     const imageUrl = `/images/uploads/${req.file.filename}`;
     res.json({ success: true, imageUrl: imageUrl });
   } catch (error) {
@@ -92,14 +82,12 @@ app.post('/api/upload-image', upload.single('image'), (req, res) => {
   }
 });
 
-// Multiple images upload endpoint (for listing photos)
 app.post('/api/upload-images', upload.array('images', 10), (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
     
-    // Return array of image URLs
     const imageUrls = req.files.map(file => `/images/uploads/${file.filename}`);
     res.json({ success: true, imageUrls: imageUrls });
   } catch (error) {
@@ -108,7 +96,6 @@ app.post('/api/upload-images', upload.array('images', 10), (req, res) => {
   }
 });
 
-// Error handling middleware for multer
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
@@ -121,140 +108,207 @@ app.use((error, req, res, next) => {
   next(error);
 });
 
-// const SIMULATED_USER_ID = 1;
-
 app.get("/api/room-listings", async (req, res) => {
-    const userId = req.session?.user_id;
-    if (!userId) return res.status(401).json({ error: 'Not logged in' });
-
-    const excludeSwiped = req.query.excludeSwiped === 'true';
-    const includeOwn = req.query.includeOwn === 'true';  // Add this parameter
-    
-    try {
-        let listings;
-        if (excludeSwiped) {
-            listings = await db.query(
-                `
-                SELECT * FROM roomListings
-                WHERE user_id != ? 
-                AND user_id NOT IN (
-                    SELECT liked_id FROM user_likes
-                    WHERE liker_id = ?
-                )
-                `,
-                [userId, userId]
-            );
-        } else {
-            if (includeOwn) {
-                // For profile pages - get ALL listings including user's own
-                listings = await db.query(`SELECT * FROM roomListings`);
-            } else {
-                // For main browsing - exclude user's own listings
-                listings = await db.query(
-                    `SELECT * FROM roomListings WHERE user_id != ?`,
-                    [userId]
-                );
-            }
-        }
-
-        if (!listings.length) {
-            console.log("No roomListings found");
-            return res.json([]);
-        }
-
-        for (const listing of listings) {
-            const photos = await db.query(
-                "SELECT photo_url FROM listing_photos WHERE room_id = ?",
-                [listing.room_id]
-            );
-            listing.photos = photos.map(p => p.photo_url);
-        }
-
-        res.json(listings);
-
-    } catch (error) {
-        console.error("Error fetching room listings:", error);
-        res.status(500).json({ error: "Could not fetch listing" });
-    }
-});
-
-app.get("/api/flatmate-listings", async (req, res) => {
-    const userId = req.session?.user_id;
-    if (!userId) return res.status(401).json({ error: 'Not logged in' });
-
-    const excludeSwiped = req.query.excludeSwiped === 'true';
-    const includeOwn = req.query.includeOwn === 'true';  // Add this parameter
-    
-    try {
-        let listings;
-        if (excludeSwiped) {
-            listings = await db.query(
-                `
-                SELECT * FROM flatmateListings
-                WHERE user_id != ? 
-                AND user_id NOT IN (
-                    SELECT liked_id FROM user_likes
-                    WHERE liker_id = ?
-                )
-                `,
-                [userId, userId]
-            );
-        } else {
-            if (includeOwn) {
-                // For profile pages - get ALL listings including user's own
-                listings = await db.query(`SELECT * FROM flatmateListings`);
-            } else {
-                // For main browsing - exclude user's own listings
-                listings = await db.query(
-                    `SELECT * FROM flatmateListings WHERE user_id != ?`,
-                    [userId]
-                );
-            }
-        }
-
-        if (!listings.length) {
-            console.log("No flatmateListings found");
-            return res.json([]);
-        }
-
-        for (const listing of listings) {
-            const photos = await db.query(
-                "SELECT photo_url FROM listing_photos WHERE flatmate_id = ?",
-                [listing.flatmate_id]
-            );
-            listing.photos = photos.map(p => p.photo_url);
-        }
-
-        res.json(listings);
-
-    } catch (error) {
-        console.error("Error fetching flatmate listings:", error);
-        res.status(500).json({ error: "Could not fetch listing" });
-    }
-});
-
-app.get('/api/users/:id/listing-type', async (req, res) => {
   const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
+  const excludeSwiped = req.query.excludeSwiped === 'true';
+  const includeOwn = req.query.includeOwn === 'true';
 
   try {
-    const roomListing = await db.query(
-      'SELECT 1 FROM roomListings WHERE user_id = ? LIMIT 1',
-      [userId]
-    );
+    const [currentUser] = await db.query(`
+        SELECT u.*, p.pet_owner, p.smoker_status 
+        FROM users u 
+        LEFT JOIN profiles p ON u.user_id = p.user_id 
+        WHERE u.user_id = ?
+    `, [userId]);
+    if (!currentUser) return res.status(404).json({ error: "User not found" });
 
-    if (roomListing.length > 0) {
-      res.json({ listingType: 'hasRoom' });
-    } else {
-      res.json({ listingType: 'needsRoom' }); 
+    const userAnswers = await db.query("SELECT * FROM user_answers WHERE user_id = ?", [userId]);
+    currentUser.answers = {};
+    for (const row of userAnswers) {
+      if (!currentUser.answers[row.question_id]) currentUser.answers[row.question_id] = [];
+      currentUser.answers[row.question_id].push(row.option_text);
     }
+
+    currentUser.listingType = "needsRoom";
+
+    let listings;
+    if (excludeSwiped) {
+      listings = await db.query(
+        `
+        SELECT * FROM roomListings
+        WHERE user_id != ? 
+        AND user_id NOT IN (
+          SELECT liked_id FROM user_likes WHERE liker_id = ?
+        )
+        `,
+        [userId, userId]
+      );
+    } else {
+      if (includeOwn) {
+        listings = await db.query(`SELECT * FROM roomListings`);
+      } else {
+        listings = await db.query(
+          `SELECT * FROM roomListings WHERE user_id != ?`,
+          [userId]
+        );
+      }
+    }
+
+    if (!listings.length) return res.json([]);
+
+    const scoredListings = [];
+    for (const listing of listings) {
+      const photos = await db.query(
+        "SELECT photo_url FROM listing_photos WHERE room_id = ?",
+        [listing.room_id]
+      );
+      listing.photos = photos.map(p => p.photo_url);
+
+      const answers = await db.query("SELECT * FROM user_answers WHERE user_id = ?", [listing.user_id]);
+      listing.answers = {};
+      for (const a of answers) {
+        if (!listing.answers[a.question_id]) listing.answers[a.question_id] = [];
+        listing.answers[a.question_id].push(a.option_text);
+      }
+
+      const [ownerData] = await db.query(`
+        SELECT p.pet_owner, p.smoker_status, u.dob 
+        FROM profiles p
+        LEFT JOIN users u ON p.user_id = u.user_id
+        WHERE p.user_id = ?
+      `, [listing.user_id]);
+
+      if (ownerData) {
+        listing.pet_owner = ownerData.pet_owner;
+        listing.smoker_status = ownerData.smoker_status;
+        listing.dob = ownerData.dob;
+      }
+
+      listing.listingType = "hasRoom";
+
+      if (includeOwn) {
+        scoredListings.push({ ...listing, matchScore: 0 });
+      } else {
+        const score = calculateCompatibilityScore(currentUser, listing);
+        
+        if (score !== null) {
+          scoredListings.push({ ...listing, matchScore: score });
+        }
+      }
+    }
+
+    scoredListings.sort((a, b) => b.matchScore - a.matchScore);
+    
+    res.json(scoredListings);
+
   } catch (error) {
-    console.error('Error determining listing type:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching room listings:", error);
+    res.status(500).json({ error: "Could not fetch listing" });
   }
 });
 
+app.get("/api/flatmate-listings", async (req, res) => {
+  const userId = req.session?.user_id;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
+  const excludeSwiped = req.query.excludeSwiped === 'true';
+  const includeOwn = req.query.includeOwn === 'true';
+
+  try {
+    const [currentUser] = await db.query(`
+        SELECT u.*, p.pet_owner, p.smoker_status 
+        FROM users u 
+        LEFT JOIN profiles p ON u.user_id = p.user_id 
+        WHERE u.user_id = ?
+    `, [userId]);
+    if (!currentUser) return res.status(404).json({ error: "User not found" });
+
+    const userAnswers = await db.query("SELECT * FROM user_answers WHERE user_id = ?", [userId]);
+    currentUser.answers = {};
+    for (const row of userAnswers) {
+      if (!currentUser.answers[row.question_id]) currentUser.answers[row.question_id] = [];
+      currentUser.answers[row.question_id].push(row.option_text);
+    }
+
+    currentUser.listingType = "hasRoom";
+
+    let listings;
+    if (excludeSwiped) {
+      listings = await db.query(
+        `
+        SELECT * FROM flatmateListings
+        WHERE user_id != ? 
+        AND user_id NOT IN (
+          SELECT liked_id FROM user_likes WHERE liker_id = ?
+        )
+        `,
+        [userId, userId]
+      );
+    } else {
+      if (includeOwn) {
+        listings = await db.query(`SELECT * FROM flatmateListings`);
+      } else {
+        listings = await db.query(
+          `SELECT * FROM flatmateListings WHERE user_id != ?`,
+          [userId]
+        );
+      }
+    }
+
+    if (!listings.length) return res.json([]);
+
+    const scoredListings = [];
+    for (const listing of listings) {
+      const photos = await db.query(
+        "SELECT photo_url FROM listing_photos WHERE flatmate_id = ?",
+        [listing.flatmate_id]
+      );
+      listing.photos = photos.map(p => p.photo_url);
+
+      const answers = await db.query("SELECT * FROM user_answers WHERE user_id = ?", [listing.user_id]);
+      listing.answers = {};
+      for (const a of answers) {
+        if (!listing.answers[a.question_id]) listing.answers[a.question_id] = [];
+        listing.answers[a.question_id].push(a.option_text);
+      }
+
+      const [ownerData] = await db.query(`
+        SELECT p.pet_owner, p.smoker_status, u.dob 
+        FROM profiles p
+        LEFT JOIN users u ON p.user_id = u.user_id
+        WHERE p.user_id = ?
+      `, [listing.user_id]);
+
+      if (ownerData) {
+        listing.pet_owner = ownerData.pet_owner;
+        listing.smoker_status = ownerData.smoker_status;
+        listing.dob = ownerData.dob;
+      }
+
+      listing.listingType = "needsRoom";
+
+      if (includeOwn) {
+        scoredListings.push({ ...listing, matchScore: 0 });
+      } else {
+        const score = calculateCompatibilityScore(currentUser, listing);
+        
+        if (score !== null) {
+          scoredListings.push({ ...listing, matchScore: score });
+        }
+      }
+    }
+
+    scoredListings.sort((a, b) => b.matchScore - a.matchScore);
+
+    res.json(scoredListings);
+
+  } catch (error) {
+    console.error("Error fetching flatmate listings:", error);
+    res.status(500).json({ error: "Could not fetch listing" });
+  }
+});
 
 app.post('/api/like', async (req, res) => {
   const userId = req.session?.user_id;
@@ -269,7 +323,6 @@ app.post('/api/like', async (req, res) => {
 
   try {
     console.log(`Inserting/updating like: likerId=${likerId}, likedUserId=${likedUserId}, liked=${liked}`);
-    // Your DB query here
     await db.query(
       'INSERT INTO user_likes (liker_id, liked_id, liked, created_at) VALUES (?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE liked = ?',
       [likerId, likedUserId, liked, liked]
@@ -446,42 +499,12 @@ app.get('/api/matches', async (req, res) => {
     }
 });
 
-//question grabber for questionnaire
-// app.get('/api/questions', async (req, res) => {
-//   try {
-//     // 1. Get all questions
-//     const [questions] = await db.query(
-//       `SELECT question_id, question_text, question_type FROM questions ORDER BY question_id`
-//     );
-
-//     // 2. Get all options
-//     const [options] = await db.query(
-//       `SELECT question_options_id, question_id, option_text FROM question_options`
-//     );
-
-//     // 3. Attach options to each question
-//     const questionsWithOptions = questions.map((q) => ({
-//       ...q,
-//       options: options.filter((o) => o.question_id === q.question_id),
-//     }));
-
-//     res.json(questionsWithOptions);
-//   } catch (err) {
-//     console.error('Failed to fetch questions:', err);
-//     res.status(500).json({ error: 'Failed to fetch questions' });
-//   }
-// });
-
-// GET /api/questions
-
 app.get('/api/questions', async (req, res) => {
   try {
     const allowedIds = [1, 3, 5, 6, 8, 10, 12];
 
-    // Convert IDs to a comma-separated string for SQL
     const idsStr = allowedIds.join(',');
 
-    // Fetch only the selected questions
     const questionsResult = await db.query(
       `SELECT question_id, question_text, question_type 
        FROM questions 
@@ -490,7 +513,6 @@ app.get('/api/questions', async (req, res) => {
     );
     const questions = Array.isArray(questionsResult[0]) ? questionsResult[0] : questionsResult;
 
-    // Fetch only options for those questions
     const optionsResult = await db.query(
       `SELECT question_options_id, question_id, option_text 
        FROM question_options 
@@ -498,7 +520,6 @@ app.get('/api/questions', async (req, res) => {
     );
     const options = Array.isArray(optionsResult[0]) ? optionsResult[0] : optionsResult;
 
-    // Attach options to their questions
     const questionsWithOptions = questions.map(q => ({
       ...q,
       options: options.filter(o => o.question_id === q.question_id)
@@ -512,7 +533,6 @@ app.get('/api/questions', async (req, res) => {
   }
 });
 
-// GET /api/users/:id/profile
 app.get('/api/users/:id/profile', async (req, res) => {
   const userId = req.params.id;
 
@@ -578,10 +598,6 @@ app.get('/api/users/:id/profile', async (req, res) => {
   }
 });
 
-
-
-//Added routes to try and get login working:
-
 app.get('/api/session', (req, res) => {
   if (req.session?.user_id) {
     res.json({
@@ -640,7 +656,6 @@ app.post('/api/set-password', async function (req, res) {
 
   const { first_name, last_name, dob, email, password } = req.body;
 
-  // Log individual fields
   console.log('Parsed fields:', {
     first_name,
     last_name,
@@ -649,7 +664,6 @@ app.post('/api/set-password', async function (req, res) {
     password,
   });
 
-  // Quick check: are any required fields missing?
   if (!first_name || !last_name || !dob || !email || !password) {
     console.warn('Missing required fields');
     return res.status(400).json({ success: false, error: 'Missing required fields' });
@@ -661,19 +675,15 @@ app.post('/api/set-password', async function (req, res) {
     let user_id = await user.getIdFromEmail();
 
     if (user_id !== false) {
-      // User exists — reject registration attempt
       return res.status(400).json({ success: false, error: 'Email already in use' });
     } else {
-      // Create new user
       user_id = await user.addUser(first_name, last_name, dob, email, password);
     }
 
 
-    // Log them in immediately
     req.session.user_id = user_id;
     req.session.loggedIn = true;
 
-    // Store username/display name in session
     const sql = "SELECT email FROM users WHERE user_id = ?";
     const result = await db.query(sql, [user_id]);
     console.log("User info query result:", result);
@@ -686,7 +696,6 @@ app.post('/api/set-password', async function (req, res) {
   } catch (err) {
     console.error('Error setting password:', err);
 
-    // If the error is about undefined SQL params, call that out clearly
     if (err.message.includes('Bind parameters must not contain undefined')) {
       return res.status(500).json({ success: false, error: 'Internal error: invalid database values (undefined)' });
     }
@@ -695,10 +704,6 @@ app.post('/api/set-password', async function (req, res) {
   }
 });
 
-
-
-
-// Check submitted email and password pair
 app.post('/api/authenticate', async function (req, res) {
   const { email, password } = req.body;
   const user = new User(email);
@@ -714,7 +719,6 @@ app.post('/api/authenticate', async function (req, res) {
       return res.status(401).json({ success: false, error: 'Invalid password' });
     }
 
-    // Set session
     req.session.user_id = user_id;
     req.session.loggedIn = true;
     req.session.email = email; 
@@ -733,7 +737,7 @@ app.post('/api/logout', (req, res) => {
       return res.status(500).json({ error: 'Could not log out' });
     }
 
-    res.clearCookie('connect.sid'); // Optional: explicitly clear session cookie
+    res.clearCookie('connect.sid'); 
     res.json({ message: 'Logged out successfully' });
   });
 });
@@ -744,20 +748,18 @@ app.post('/api/profile-setup', async (req, res) => {
   const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
 
-  const { step1, step2, step3, step4, step5 } = req.body; // fullProfileData
+  const { step1, step2, step3, step4, step5 } = req.body; 
 
   try {
     if (step1) {
   console.log('Processing step1...', step1);
   
-  // Check if profile exists
   const existingProfile = await db.query(
     `SELECT user_id FROM profiles WHERE user_id = ?`,
     [userId]
   );
   
   if (existingProfile.length > 0) {
-    // Profile exists, update it
     await db.query(
       `UPDATE profiles 
         SET bio = ?,
@@ -770,51 +772,17 @@ app.post('/api/profile-setup', async (req, res) => {
       ]
     );
   } 
-  // else {
-  //   // Profile doesn't exist, create it
-  //   await db.query(
-  //     `INSERT INTO profiles (user_id, bio, profile_picture_url, occupation, occupation_visible, student_status, 
-  //     student_status_visible, pet_owner, smoker_status, pronouns, pronouns_visible, 
-  //     lgbtq_identity, lgbtq_identity_visible, seeking_lgbtq_home, seeking_lgbtq_home_visible, 
-  //     gender_identity, gender_identity_visible, seeking_women_only_home, seeking_women_only_home_visible) 
-  //      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  //     [
-  //       userId,
-  //       step1.bio || '',
-  //       step1.profilePictureUrl || null,
-  //       null,
-  //       1,
-  //       null,
-  //       1,
-  //       0,
-  //       null,
-  //       null,
-  //       1,
-  //       0,
-  //       1,
-  //       0,
-  //       1,
-  //       null,
-  //       1,
-  //       0,
-  //       1,
-  //     ]
-  //   );
-  // }
-  console.log('Step1 completed');
 }
 
   if (step2) {
     console.log('Processing step2...', step2);
     
-    // Check if profile exists (it should exist after step1, but just to be safe)
     const existingProfile = await db.query(
       `SELECT user_id FROM profiles WHERE user_id = ?`,
       [userId]
     );
     
     if (existingProfile.length > 0) {
-      // Profile exists, update it
       await db.query(
         `UPDATE profiles SET 
           occupation = ?,
@@ -837,7 +805,6 @@ app.post('/api/profile-setup', async (req, res) => {
           step2.hideStudent || null,
           step2.pets === 'yes' ? 1 : 0,
           step2.smokes === 'yes' ? 1 : 0,
-          // step2.smokingOptions ? step2.smokingOptions.join(', ') : null,
           step2.pronouns || null,
           step2.hidePronouns || null,
           step2.lgbtq || null,
@@ -848,7 +815,6 @@ app.post('/api/profile-setup', async (req, res) => {
         ]
       );
     } else {
-      // Profile doesn't exist, create it with step2 data
       await db.query(
         `INSERT INTO profiles 
         (user_id, bio, profile_picture_url, occupation, occupation_visible, student_status, student_status_visible, 
@@ -865,7 +831,6 @@ app.post('/api/profile-setup', async (req, res) => {
           step2.hideStudent || null,
           step2.pets === 'yes' ? 1 : 0,
           step2.smokes === 'yes' ? 1 : 0,
-          // step2.smokingOptions ? step2.smokingOptions.join(', ') : null,
           step2.pronouns || null,
           step2.hidePronouns || null,
           step2.lgbtq === 'yes' ? 1 : 0,
@@ -875,13 +840,10 @@ app.post('/api/profile-setup', async (req, res) => {
         ]
       );
     }
-    console.log('Step2 completed');
   }
 
-    // Step 4
     if (step4) {
       if (step4.listingType === 'hasRoom') {
-        // In your step4 processing, before any destructuring:
 console.log('About to query roomListings...');
 
 try {
@@ -894,12 +856,11 @@ try {
   console.log('Type of result:', typeof queryResult);
   console.log('Is array?', Array.isArray(queryResult));
   
-  // Now handle the result appropriately
   let existing;
   if (Array.isArray(queryResult)) {
-    existing = queryResult; // Use the result directly
+    existing = queryResult; 
   } else if (Array.isArray(queryResult[0])) {
-    existing = queryResult[0]; // Use the first element if it's nested
+    existing = queryResult[0]; 
   } else {
     existing = [];
   }
@@ -930,6 +891,7 @@ try {
               age_range_min = ?,
               age_range_max = ?,
               description = ?,
+              pets_accepted = ?,
               women_only_household = ?,
               lgbtq_only_household = ?
             WHERE user_id = ?`,
@@ -943,6 +905,7 @@ try {
               step4.flatmates_age_min || null,
               step4.flatmates_age_max || null,
               step4.description || null,
+              step4.petsAccepted === 'yes' ? 1 : 0,
               step4.womenOnlyHomeYN === 'yes' ? 1 : 0,
               step4.lgbtqOnlyHomeYN === 'yes' ? 1 : 0,
               userId
@@ -952,8 +915,8 @@ try {
         } else {
           const result = await db.query(
             `INSERT INTO roomListings
-              (user_id, location, rent, move_in_date_min, move_in_date_max, tenancy_length, num_flatmates, age_range_min, age_range_max, description, women_only_household, lgbtq_only_household)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              (user_id, location, rent, move_in_date_min, move_in_date_max, tenancy_length, num_flatmates, age_range_min, age_range_max, description, pets_accepted, women_only_household, lgbtq_only_household)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               userId,
               step4.location || null,
@@ -965,6 +928,7 @@ try {
               step4.flatmates_age_min || null,
               step4.flatmates_age_max || null,
               step4.description || null,
+              step4.petsAccepted === 'yes' ? 1 : 0,
               step4.womenOnlyHomeYN === 'yes' ? 1 : 0,
               step4.lgbtqOnlyHomeYN === 'yes' ? 1 : 0
             ]
@@ -1004,6 +968,7 @@ try {
               age_range_min = ?,
               age_range_max = ?,
               description = ?,
+              open_to_pets = ?,
               seeking_women_only_household = ?,
               seeking_lgbtq_only_household = ?
             WHERE user_id = ?`,
@@ -1019,6 +984,7 @@ try {
               step4.flatmates_age_min_preferred || null,
               step4.flatmates_age_max_preferred || null,
               step4.description || null,
+              step4.openToPets === 'yes' ? 1 : 0,
               step4.seekingWomenOnlyHomeYN === 'yes' ? 1 : 0,
               step4.seekingLgbtqOnlyHomeYN === 'yes' ? 1 : 0,
               userId
@@ -1028,8 +994,8 @@ try {
         } else {
           const result = await db.query(
             `INSERT INTO flatmateListings
-              (user_id, location, budget_min, budget_max, move_in_date_min, move_in_date_max, stay_length, num_flatmates_min, num_flatmates_max, age_range_min, age_range_max, description, seeking_women_only_household, seeking_lgbtq_only_household)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              (user_id, location, budget_min, budget_max, move_in_date_min, move_in_date_max, stay_length, num_flatmates_min, num_flatmates_max, age_range_min, age_range_max, description, open_to_pets, seeking_women_only_household, seeking_lgbtq_only_household)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               userId,
               step4.preferred_location || null,
@@ -1043,6 +1009,7 @@ try {
               step4.flatmates_age_min_preferred || null,
               step4.flatmates_age_max_preferred || null,
               step4.description || null,
+              step4.openToPets === 'yes' ? 1 : 0,
               step4.seekingWomenOnlyHomeYN === 'yes' ? 1 : 0,
               step4.seekingLgbtqOnlyHomeYN === 'yes' ? 1 : 0
             ]
@@ -1062,34 +1029,6 @@ try {
       }
     }
 
-    // ✅ Step 5 goes *inside the same try block*
-    // if (step5 && Array.isArray(step5)) {
-    //   for (const ans of step5) {
-    //     if (!ans.question_id || !ans.question_options_id) continue;
-
-    //     const result = await db.query(
-    //       `SELECT * FROM user_answers WHERE user_id = ? AND question_id = ?`,
-    //       [userId, ans.question_id]
-    //     );
-    //     const existing = Array.isArray(result[0]) ? result[0] : result;
-
-    //     if (existing.length > 0) {
-    //       await db.query(
-    //         `DELETE FROM user_answers WHERE user_id = ? AND question_id = ?`,
-    //         [userId, ans.question_id]
-    //       );
-    //     }
-
-    //     await db.query(
-    //       `INSERT INTO user_answers 
-    //         (user_id, question_id, question_options_id, answer_rank, created_at, updated_at)
-    //       VALUES (?, ?, ?, NULL, NOW(), NOW())`,
-    //       [userId, ans.question_id, ans.question_options_id]
-    //     );
-    //   }
-    // }
-
-    // ✅ Step 5 goes *inside the same try block*
   if (step5 && Array.isArray(step5)) {
     console.log('Processing step5...'); 
     console.log('step5 data:', step5);
@@ -1110,7 +1049,6 @@ try {
       console.log('Query result is array:', Array.isArray(result));
       console.log('Query result:', result);
       
-      // This line might be causing the issue:
       const existing = Array.isArray(result[0]) ? result[0] : result;
       
       console.log('Processed existing:', existing);
@@ -1146,7 +1084,6 @@ try {
 
 
 
-// Start server on port 3000
 app.listen(3000,function(){
     console.log(`Server running at http://127.0.0.1:3000/`);
 });
