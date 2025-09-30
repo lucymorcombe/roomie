@@ -102,18 +102,32 @@ function RoomListingsContainer({ onChangeListing }) {
         <>
             <div>
                 {isMobile ? (
-                    <SwipeStack
-                        listings={listings}
-                        onLike={(listing) => handleLike(listing.user_id, true)}
-                        onDislike={(listing) => handleLike(listing.user_id, false)}
-                    />
+                    currentIndex < listings.length ? (
+                        <SwipeStack
+                            listings={listings}
+                            onLike={(listing) => handleLike(listing.user_id, true)}
+                            onDislike={(listing) => handleLike(listing.user_id, false)}
+                        />
+                    ) : (
+                        <div className="noMoreProfiles">
+                            <h2>No more profiles to swipe!</h2>
+                            <p>Please check back later.</p>
+                        </div>
+                    )
                 ) : (
                     <>
-                        {listings[currentIndex] && (
-                            <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
+                        {currentIndex < listings.length ? (
+                            <>
+                                <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
+                                <DislikeButton onClick={handleNo} />
+                                <LikeButton onClick={handleYes} />
+                            </>
+                        ) : (
+                            <div className="noMoreProfiles">
+                                <h2>No more profiles to swipe!</h2>
+                                <p>Please check back later.</p>
+                            </div>
                         )}
-                        <DislikeButton onClick={handleNo} />
-                        <LikeButton onClick={handleYes} />
                     </>
                 )}
             </div>
