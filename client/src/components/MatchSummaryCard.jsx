@@ -1,3 +1,5 @@
+import profileBackupIcon from '../assets/profileBackupIcon.png';
+
 function MatchSummaryCard(props) {
     const formatDate = (dateString) => {
         if (!dateString) return null; 
@@ -15,7 +17,11 @@ function MatchSummaryCard(props) {
     return (
         <div className="matchSummaryCard">
             <div className="matchImgAndPrice">
-                <img src={`http://localhost:3000${props.first_photo}`} alt="Listing photo" />
+                <img 
+                    src={`http://localhost:3000${props.first_photo}`} 
+                    alt="Listing photo" 
+                    onError={(e) => { e.target.onerror = null; e.target.src = profileBackupIcon; }}
+                />
             </div>
             <div className="matchQuickInfo">
 

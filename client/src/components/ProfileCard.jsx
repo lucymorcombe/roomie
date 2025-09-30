@@ -1,3 +1,5 @@
+import profileBackupIcon from '../assets/profileBackupIcon.png';
+
 function ProfileCard(props) {
   // Function to calculate age from dob
   function calculateAge(dob) {
@@ -25,6 +27,7 @@ function ProfileCard(props) {
           src={`http://localhost:3000${props.profilePicture}`}
           alt={`${props.firstName}'s profile`}
           className="profilePicture"
+          onError={(e) => { e.target.onerror = null; e.target.src = profileBackupIcon; }}
         />
       )}
       <div className="profileInfo">
