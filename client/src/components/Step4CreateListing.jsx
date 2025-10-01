@@ -95,7 +95,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
       <form onSubmit={handleSubmit(onSubmitStep4)}>
 
         <div>
-          <label>Upload photos (3-10)</label>
+          <label>Upload photos (3-10)<span className='required'>*</span></label>
           <input 
             type="file" 
             accept="image/*" 
@@ -150,12 +150,12 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>How much is the rent?</label>
+              <label>How much is the rent?<span className='required'>*</span></label>
               <input type="number" {...register('rent')} />
             </>
           ) : (
             <>
-              <label>What is your budget?</label>
+              <label>What is your budget?<span className='required'>*</span></label>
               <div className="rangeGroup">
                 <input type="number" placeholder="Minimum (£)" {...register('budget_min')} />
                 <input type="number" placeholder="Maximum (£)" {...register('budget_max')} />
@@ -167,12 +167,12 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>When is the room available?</label>
+              <label>When is the room available?<span className='required'>*</span></label>
               <input type="date" {...register('available_date')} />
             </>
           ) : (
             <>
-              <label>When do you need to move?</label>
+              <label>When do you need to move?<span className='required'>*</span></label>
               <div className="rangeGroup">
                 <input type="date" placeholder="Earliest" {...register('move_in_min')} />
                 <input type="date" placeholder="Latest" {...register('move_in_max')} />
@@ -184,12 +184,12 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>How long is the tenancy?</label>
+              <label>How long is the tenancy?<span className='required'>*</span></label>
               <input type="text" {...register('tenancy_length')} />
             </>
           ) : (
             <>
-              <label>How long do you want to stay?</label>
+              <label>How long do you want to stay?<span className='required'>*</span></label>
               <input type="number" placeholder="Months" {...register('stay_length')} />
             </>
           )}
@@ -198,12 +198,12 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>What's the location?</label>
+              <label>What's the location?<span className='required'>*</span></label>
               <input type="text" {...register('location')} />
             </>
           ) : (
             <>
-              <label>Where do you want to live?</label>
+              <label>Where do you want to live?<span className='required'>*</span></label>
               <input type="text" {...register('preferred_location')} />
             </>
           )}
@@ -212,12 +212,12 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>How many current flatmates are there?</label>
+              <label>How many current flatmates are there?<span className='required'>*</span></label>
               <input type="number" {...register('flatmates_current')} />
             </>
           ) : (
             <>
-              <label>How many flatmates do you want?</label>
+              <label>How many flatmates do you want?<span className='required'>*</span></label>
               <div className="rangeGroup">
                 <input type="number" placeholder="Minimum" {...register('flatmates_min')} />
                 <input type="number" placeholder="Maximum" {...register('flatmates_max')} />
@@ -229,7 +229,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>What is the age range of the current flatmates?</label>
+              <label>What is the age range of the current flatmates?<span className='required'>*</span></label>
               <div className="rangeGroup">
                 <input type="number" placeholder="Youngest" {...register('flatmates_age_min')} />
                 <input type="number" placeholder="Oldest" {...register('flatmates_age_max')} />
@@ -237,7 +237,7 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
             </>
           ) : (
             <>
-              <label>What age range are you looking for?</label>
+              <label>What age range are you looking for?<span className='required'>*</span></label>
               <div className="rangeGroup">
                 <input type="number" placeholder="Youngest" {...register('flatmates_age_min_preferred')} />
                 <input type="number" placeholder="Oldest" {...register('flatmates_age_max_preferred')} />
@@ -249,12 +249,12 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
         <div>
           {listingType === 'hasRoom' ? (
             <>
-              <label>Tell us more about you, your current flatmates, and the room:</label>
+              <label>Tell us more about you, your current flatmates, and the room:<span className='required'>*</span></label>
               <textarea {...register('description')} />
             </>
           ) : (
             <>
-              <label>Tell us more about you and what you're looking for:</label>
+              <label>Tell us more about you and what you're looking for:<span className='required'>*</span></label>
               <textarea {...register('description')} />
             </>
           )}
@@ -264,16 +264,16 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           {listingType === 'hasRoom' ? (
             <>
               <div className="inlineRadios">
-                <label>Does your home accept pets?</label>
+                <label>Does your home accept pets?<span className='required'>*</span></label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('petsAccepted')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('petsAccepted')} /> No</label>
               </div>
               <div className="inlineRadios">
-                <label>Is your home a women-only home?</label>
+                <label>Is your home a women-only home?<span className='required'>*</span></label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
               </div>
-              <div className="inlineRadios">
+              <div className="inlineRadios"><span className='required'>*</span>
                 <label>Is your home a lgbtq+ only home?</label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>
@@ -282,17 +282,17 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           ) : (
             <>
               <div className="inlineRadios">
-                <label>Are you happy to live with pets?</label>
+                <label>Are you happy to live with pets?<span className='required'>*</span></label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('openToPets')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('openToPets')} /> No</label>
               </div>
               <div className="inlineRadios">
-                <label>Are you looking for a women-only home?</label>
+                <label>Are you looking for a women-only home?<span className='required'>*</span></label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('seekingWomenOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('seekingWomenOnlyHomeYN')} /> No</label>
               </div>
               <div className="inlineRadios">
-                <label>Are you looking for a lgbtq+ only home?</label>
+                <label>Are you looking for a lgbtq+ only home?<span className='required'>*</span></label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('seekingLgbtqOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('seekingLgbtqOnlyHomeYN')} /> No</label>
               </div>
