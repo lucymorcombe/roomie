@@ -323,6 +323,28 @@ app.get("/api/flatmate-listings", async (req, res) => {
   }
 });
 
+app.get('/api/users/:id/listing-type', async (req, res) => {
+  const userId = req.session?.user_id;
+  if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
+
+  try {
+    const roomListing = await db.query(
+      'SELECT 1 FROM roomListings WHERE user_id = ? LIMIT 1',
+      [userId]
+    );
+
+    if (roomListing.length > 0) {
+      res.json({ listingType: 'hasRoom' });
+    } else {
+      res.json({ listingType: 'needsRoom' }); 
+    }
+  } catch (error) {
+    console.error('Error determining listing type:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/like', async (req, res) => {
   const userId = req.session?.user_id;
   if (!userId) return res.status(401).json({ error: 'Not logged in' });
