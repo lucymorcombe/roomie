@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { useMediaQuery } from "react-responsive";
 import RoomListingsContainer from "../components/RoomListingsContainer";
 import ProfileCard from "../components/ProfileCard";
 
 function RoomiePicks() {
   const [currentListing, setCurrentListing] = useState(null);
   const [listingUser, setListingUser] = useState(null);
+  const isMobile = useMediaQuery({ maxWidth: 768 });
 
-  // Fetch the user for the current listing
   useEffect(() => {
     if (!currentListing?.user_id) {
       setListingUser(null);
@@ -36,37 +37,40 @@ function RoomiePicks() {
       <div className="roomiePicksIntro">
         <h1>Roomie Picks</h1>
         <p>
-          Your Roomie Picks are here! We’ve lined them up so the top listings
+          Your Roomie Picks are here! We've lined them up so the top listings
           are generally your best matches, with compatibility easing a little
-          further down. But don’t scroll past the rest — you never know who
+          further down. But don't scroll past the rest — you never know who
           might surprise you. Take a peek, swipe through, and discover your
           next great flatmate!
         </p>
       </div>
 
-      <RoomListingsContainer onChangeListing={setCurrentListing} />
+      <RoomListingsContainer 
+        onChangeListing={setCurrentListing}
+        showProfileButton={true}
+      />
         
-      {listingUser && (
+      {listingUser && !isMobile && (
         <div className="picksProfile">
-        <ProfileCard
-          profilePicture={listingUser.profilePicture || ""}
-          firstName={listingUser.firstName || ""}
-          lastName={listingUser.lastName || ""}
-          dob={listingUser.dob || ""}
-          bio={listingUser.bio || ""}
-          pronouns={listingUser.pronouns || ""}
-          pronounsVisible={listingUser.pronounsVisible || false}
-          occupation={listingUser.occupation || ""}
-          occupationVisible={listingUser.occupationVisible || false}
-          studentStatus={listingUser.studentStatus || 0}
-          studentStatusVisible={listingUser.studentStatusVisible || false}
-          petOwner={listingUser.petOwner ?? null}
-          smokerStatus={listingUser.smokerStatus ?? null}
-          lgbtqIdentity={listingUser.lgbtqIdentity ?? 0}
-          lgbtqIdentityVisible={listingUser.lgbtqIdentityVisible || false}
-          genderIdentity={listingUser.genderIdentity || ""}
-          genderIdentityVisible={listingUser.genderIdentityVisible || false}
-        />
+          <ProfileCard
+            profilePicture={listingUser.profilePicture || ""}
+            firstName={listingUser.firstName || ""}
+            lastName={listingUser.lastName || ""}
+            dob={listingUser.dob || ""}
+            bio={listingUser.bio || ""}
+            pronouns={listingUser.pronouns || ""}
+            pronounsVisible={listingUser.pronounsVisible || false}
+            occupation={listingUser.occupation || ""}
+            occupationVisible={listingUser.occupationVisible || false}
+            studentStatus={listingUser.studentStatus || 0}
+            studentStatusVisible={listingUser.studentStatusVisible || false}
+            petOwner={listingUser.petOwner ?? null}
+            smokerStatus={listingUser.smokerStatus ?? null}
+            lgbtqIdentity={listingUser.lgbtqIdentity ?? 0}
+            lgbtqIdentityVisible={listingUser.lgbtqIdentityVisible || false}
+            genderIdentity={listingUser.genderIdentity || ""}
+            genderIdentityVisible={listingUser.genderIdentityVisible || false}
+          />
         </div>
       )}
     </>

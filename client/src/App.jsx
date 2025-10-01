@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { useSession } from './components/SessionContext';
 import LogoutButton from './components/LogoutButton';  // <-- import LogoutButton
@@ -15,6 +15,7 @@ import ProfileSetup from './pages/ProfileSetup';
 
 function App() {
   const { session, setSession } = useSession();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/session', {
@@ -36,31 +37,33 @@ function App() {
   return (
     <BrowserRouter>
       <header>
-        <nav>
+        <nav className="navbar">
+          <Link to="/" onClick={() => setMenuOpen(false)}>
+            <img src={logo} alt="'Roomie' written in pink" />
+          </Link>
+
+          {/* Hamburger button */}
+          <button
+            className={`menu-toggle ${menuOpen ? "open" : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? "✖" : "☰"}
+          </button>
+
           {session.loggedIn ? (
-            <>
-              <Link to="/">
-                <img src={logo} alt="'Roomie' written in pink" />
-              </Link>
-              <ul className='navBarUl'>
-                <Link to="/about-us"><li>About Us</li></Link>
-                <Link to="/roomie-picks"><li>Roomie Picks</li></Link>
-                <Link to="/likes"><li>Likes</li></Link>
-                <Link to="/matches"><li>Matches</li></Link>
-                <Link to={`/profile/${session.userId}`}><li>Profile</li></Link>
-                <li><LogoutButton /></li>  {/* Added logout button here */}
-              </ul>
-            </>
+            <ul className={`navBarUl ${menuOpen ? "show" : ""}`}>
+              <Link to="/about-us" onClick={() => setMenuOpen(false)}><li>About Us</li></Link>
+              <Link to="/roomie-picks" onClick={() => setMenuOpen(false)}><li>Roomie Picks</li></Link>
+              <Link to="/likes" onClick={() => setMenuOpen(false)}><li>Likes</li></Link>
+              <Link to="/matches" onClick={() => setMenuOpen(false)}><li>Matches</li></Link>
+              <Link to={`/profile/${session.userId}`} onClick={() => setMenuOpen(false)}><li>Profile</li></Link>
+              <li><LogoutButton /></li>
+            </ul>
           ) : (
-            <>
-              <Link to="/">
-                <img src={logo} alt="'Roomie' written in pink" />
-              </Link>
-              <ul className='navBarUl'>
-                <Link to="/about-us"><li>About Us</li></Link>
-                <Link to="/get-started"><li>Get Started</li></Link>
-              </ul>
-            </>
+            <ul className={`navBarUl ${menuOpen ? "show" : ""}`}>
+              <Link to="/about-us" onClick={() => setMenuOpen(false)}><li>About Us</li></Link>
+              <Link to="/get-started" onClick={() => setMenuOpen(false)}><li>Get Started</li></Link>
+            </ul>
           )}
         </nav>
       </header>

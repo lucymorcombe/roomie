@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
@@ -18,6 +19,8 @@ function formatAgeRange(min, max) {
 function RoomListingCard(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showMore, setShowMore] = useState(false);
+  const isMobile = useMediaQuery({ maxWidth: 768 });
 
   const openModal = (index) => {
     setCurrentIndex(index);
@@ -68,37 +71,50 @@ function RoomListingCard(props) {
         )}
       </div>
 
-      <div className="furtherInfo">
-        <ul className="listingUl">
-          <li className="listing">
-            <strong>Move in date:</strong> {formatDate(props.move_in_date_min)} - {formatDate(props.move_in_date_max)}
-          </li>
-          <li className="listing">
-            <strong>Location:</strong> {props.location}
-          </li>
+      {(isMobile && showMore || !isMobile) && (
+        <>
+          <div className="furtherInfo">
+            <ul className="listingUl">
+              <li className="listing">
+                <strong>Move in date:</strong> {formatDate(props.move_in_date_min)} - {formatDate(props.move_in_date_max)}
+              </li>
+              <li className="listing">
+                <strong>Location:</strong> {props.location}
+              </li>
 
-          {props.rent !== undefined ? (
-            <li className="listing">
-              <strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
-            </li>
-          ) : (
-            <li className="listing">
-              <strong>Preferred age range:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
-            </li>
-          )}
+              {props.rent !== undefined ? (
+                <li className="listing">
+                  <strong>Age of current flatmates:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
+                </li>
+              ) : (
+                <li className="listing">
+                  <strong>Preferred age range:</strong> {formatAgeRange(props.age_range_min, props.age_range_max)}
+                </li>
+              )}
 
-          <li className="listing">
-            <strong>Women only household:</strong> {props.women_only_household === 1 ? 'Yes' : 'No'}
-          </li>
-          <li className="listing">
-            <strong>LGBTQ+ only household:</strong> {props.lgbtq_only_household === 1 ? 'Yes' : 'No'}
-          </li>
-        </ul>
-      </div>
+              <li className="listing">
+                <strong>Women only household:</strong> {props.women_only_household === 1 ? 'Yes' : 'No'}
+              </li>
+              <li className="listing">
+                <strong>LGBTQ+ only household:</strong> {props.lgbtq_only_household === 1 ? 'Yes' : 'No'}
+              </li>
+            </ul>
+          </div>
 
-      <div className="longDescription">
-        <p>{props.description}</p>
-      </div>
+          <div className="longDescription">
+            <p>{props.description}</p>
+          </div>
+        </>
+      )}
+
+      {isMobile && (
+        <button 
+          onClick={() => setShowMore(!showMore)}
+          className="showMoreButton"
+        >
+          {showMore ? 'Show Less' : 'Show More'}
+        </button>
+      )}
 
       {isModalOpen && (
         <div className="modalOverlay">

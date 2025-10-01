@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useSprings, animated, to as interpolate } from "@react-spring/web";
 import { useDrag } from "@use-gesture/react";
 import { useMediaQuery } from "react-responsive";
@@ -7,7 +7,7 @@ import RoomListingCard from "./RoomListingCard";
 const to = (i) => ({ x: 0, y: i * -2, scale: 1, rot: 0 });
 const from = () => ({ x: 0, rot: 0, scale: 1, y: 0 });
 
-function SwipeStack({ listings, onLike, onDislike }) {
+function SwipeStack({ listings, onLike, onDislike, onIndexChange }) {
   const [gone] = useState(() => new Set());
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
@@ -19,6 +19,16 @@ function SwipeStack({ listings, onLike, onDislike }) {
     }),
     [listings.length]
   );
+
+  const currentCardIndex = useMemo(() => {
+    return listings.findIndex((_, i) => !gone.has(i));
+  }, [listings, gone]);
+
+  useEffect(() => {
+    if (onIndexChange) {
+      onIndexChange(currentCardIndex !== -1 ? currentCardIndex : 0);
+    }
+  }, [currentCardIndex, onIndexChange]);
 
   const bind = useDrag(
     ({ args: [index], down, movement: [mx], velocity: [vx], first, last }) => {
@@ -84,9 +94,8 @@ function SwipeStack({ listings, onLike, onDislike }) {
 
   const containerStyle = useMemo(() => ({
     position: "relative",
-    width: "100%",
-    maxWidth: "350px",
-    height: "500px",
+    width: "95%",
+    minHeight: "420px",
     margin: "0 auto"
   }), []);
 

@@ -5,17 +5,16 @@ import DislikeButton from "./DislikeButton";
 import { useMediaQuery } from "react-responsive";
 import SwipeStack from "./SwipeStack";
 
-function RoomListingsContainer({ onChangeListing }) { 
+function RoomListingsContainer({ onChangeListing, showProfileButton }) { 
     const [listings, setListings] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentSwipeIndex, setCurrentSwipeIndex] = useState(0);
     const [listingType, setListingType] = useState(null);
     const [showOverlay, setShowOverlay] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // Media query must be inside the component
     const isMobile = useMediaQuery({ maxWidth: 768 });
 
-    // Fetch logged-in user session
     useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
@@ -31,7 +30,6 @@ function RoomListingsContainer({ onChangeListing }) {
         fetchCurrentUser();
     }, []);
 
-    // Fetch listings based on current user
     useEffect(() => {
         if (!currentUser) return;
 
@@ -62,7 +60,6 @@ function RoomListingsContainer({ onChangeListing }) {
         fetchListings();
     }, [currentUser, onChangeListing]);
 
-    // Update the current listing when index changes
     useEffect(() => {
         if (listings[currentIndex] && onChangeListing) {
             onChangeListing(listings[currentIndex]);
@@ -103,11 +100,35 @@ function RoomListingsContainer({ onChangeListing }) {
             <div>
                 {isMobile ? (
                     currentIndex < listings.length ? (
-                        <SwipeStack
-                            listings={listings}
-                            onLike={(listing) => handleLike(listing.user_id, true)}
-                            onDislike={(listing) => handleLike(listing.user_id, false)}
-                        />
+                        <>
+                            <SwipeStack
+                                listings={listings}
+                                onLike={(listing) => handleLike(listing.user_id, true)}
+                                onDislike={(listing) => handleLike(listing.user_id, false)}
+                                onIndexChange={setCurrentSwipeIndex}
+                            />
+                            {showProfileButton && listings[currentSwipeIndex] && (
+                                <button 
+                                    onClick={() => window.location.href = `/profile/${listings[currentSwipeIndex].user_id}`}
+                                    className="viewProfileButton"
+                                    style={{
+                                        width: '90%',
+                                        marginLeft: '5%',
+                                        padding: '12px',
+                                        marginTop: '20px',
+                                        backgroundColor: '#2EE895',
+                                        color: '#000',
+                                        border: 'none',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer',
+                                        fontSize: '16px',
+                                        fontWeight: '600'
+                                    }}
+                                >
+                                    View Profile
+                                </button>
+                            )}
+                        </>
                     ) : (
                         <div className="noMoreProfiles">
                             <h2>No more profiles to swipe!</h2>
@@ -118,7 +139,12 @@ function RoomListingsContainer({ onChangeListing }) {
                     <>
                         {currentIndex < listings.length ? (
                             <>
-                                <RoomListingCard {...listings[currentIndex]} listingType={listingType} />
+                                <RoomListingCard 
+                                    {...listings[currentIndex]} 
+                                    listingType={listingType}
+                                    showProfileButton={showProfileButton}
+                                    userId={listings[currentIndex].user_id}
+                                />
                                 <DislikeButton onClick={handleNo} />
                                 <LikeButton onClick={handleYes} />
                             </>
@@ -150,17 +176,17 @@ function RoomListingsContainer({ onChangeListing }) {
                             </button>
                             <h3>How does this work?</h3>
                             <p>
-                                These are the profiles our algorithm thinks could be your ideal flatmates. Maybe you both love making friends, maybe you’re happy just waving hello in the kitchen—whatever your vibe, we’ve got you covered.
+                                These are the profiles our algorithm thinks could be your ideal flatmates. Maybe you both love making friends, maybe you're happy just waving hello in the kitchen—whatever your vibe, we've got you covered.
                                 <br /><br />
-                                You’ll also see some less compatible matches, but don’t worry, we’ll never show anyone in your dealbreaker categories.
+                                You'll also see some less compatible matches, but don't worry, we'll never show anyone in your dealbreaker categories.
                                 <br /><br />
-                                Swipe left, swipe right… looks familiar, right? Don’t worry, no awkward first dates here.
+                                Swipe left, swipe right… looks familiar, right? Don't worry, no awkward first dates here.
                                 <br /><br />
                                 <strong>On mobile:</strong> Tap a listing for more info, then swipe right if you like them or left if not.
                                 <br />
                                 <strong>On desktop:</strong> Use the heart to like, or the X to pass on a profile.
                                 <br /><br />
-                                When you get a match, you’ll get a little notification. Check Likes for people who liked you, and Matches for all your matches.
+                                When you get a match, you'll get a little notification. Check Likes for people who liked you, and Matches for all your matches.
                             </p>
                         </div>
                     </div>
