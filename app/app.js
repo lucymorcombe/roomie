@@ -722,6 +722,16 @@ app.post('/api/set-password', async function (req, res) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
 
+  if (password.length < 6) {
+    return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+  }
+  if (!/[A-Z]/.test(password)) {
+    return res.status(400).json({ success: false, error: 'Password must contain at least one capital letter' });
+  }
+  if (!/[0-9]/.test(password)) {
+    return res.status(400).json({ success: false, error: 'Password must contain at least one number' });
+  }
+
   const user = new User(email);
 
   try {

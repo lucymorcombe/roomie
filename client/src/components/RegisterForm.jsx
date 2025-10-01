@@ -12,11 +12,35 @@ function RegisterForm() {
     email: '',
     password: ''
   });
+  const [passwordError, setPasswordError] = useState('');
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const validatePassword = (pwd) => {
+    if (pwd.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      return 'Password must contain at least one capital letter';
+    }
+    if (!/[0-9]/.test(pwd)) {
+      return 'Password must contain at least one number';
+    }
+    return '';
+  };
+
+  const handleChange = e => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === 'password') {
+      setPasswordError(validatePassword(e.target.value));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const error = validatePassword(form.password);
+    if (error) {
+      setPasswordError(error);
+      return;
+    }
     const res = await fetch('/api/set-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -87,6 +111,11 @@ function RegisterForm() {
           value={form.password}
           onChange={handleChange}
         />
+        {passwordError && (
+          <span className="passwordError">
+            {passwordError}
+          </span>
+        )}
       </label>
 
       <button type="submit">Register</button>

@@ -371,7 +371,11 @@ form small {
   margin-bottom: 1rem;
 }
 
-
+.passwordError {
+  color: #E82E81;
+  font-size: 14px;
+  margin-top: 3px;
+}
 
 /* Profile Setup Wizard */
 .profileSetupPage {
