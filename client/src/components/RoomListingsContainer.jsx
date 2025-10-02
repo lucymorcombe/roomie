@@ -60,7 +60,6 @@ function RoomListingsContainer({ onChangeListing, showProfileButton }) {
         fetchListings();
     }, [currentUser, onChangeListing]);
 
-    // Update listing based on which mode we're in
     useEffect(() => {
         const activeIndex = isMobile ? currentSwipeIndex : currentIndex;
         if (listings[activeIndex] && onChangeListing) {
