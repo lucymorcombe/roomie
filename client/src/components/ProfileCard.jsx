@@ -48,11 +48,11 @@ function ProfileCard(props) {
 
         <div className="row3">
 
-          {props.occupationVisible && (
+          {props.occupationVisible === 1 && (
             <p>• {props.occupation}</p>
           )}
 
-          {props.studentStatusVisible && (
+          {props.studentStatusVisible === 1 && (
             <p>• Student? <span className="tickCross">{props.studentStatus ? '✔' : '✖'}</span></p>
           )}
 
@@ -62,11 +62,11 @@ function ProfileCard(props) {
 
           <p>• Smokes/Vapes? <span className="tickCross">{props.smokerStatus ? '✔' : '✖'}</span></p>
 
-          {props.lgbtqIdentityVisible && (
+          {props.lgbtqIdentityVisible === 1 && (
             <p>• LGBTQ+? <span className="tickCross">{props.lgbtqIdentity === 1 ? '✔' : '✖'}</span></p>
           )}
 
-          {props.genderIdentityVisible && (
+          {props.genderIdentityVisible === 1 && (
             <p>• {props.genderIdentity}</p>
           )}
         </div>

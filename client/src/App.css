@@ -1081,13 +1081,14 @@ button.slick-arrow.slick-prev::before {
   object-position: center;
   flex-shrink: 0;
   border: 10px solid #E82E81;
-  transform: scale(1.1) translateX(-25%); 
+  transform: scale(1.1) translateX(-30%); 
   transform-origin: center; 
   
 }
 
 .profileInfo {
   transform: translateX(-10%);
+  width: 100%;
 }
 
 .row1 {
@@ -1098,6 +1099,7 @@ button.slick-arrow.slick-prev::before {
 
 .row1 h2 {
   margin: 0;
+  
 }
 
 .row1 p {
@@ -1248,14 +1250,14 @@ p.matchedOn {
   }
 
   ul.navBarUl {
-    display: none; /* hide by default */
+    display: none; 
     flex-direction: column;
     position: absolute;
     width: 100vw;
     height: auto;
     top: 30px;
     left: -17px;
-    background-color: #E82E81; /* match your pink header */
+    background-color: #E82E81; 
     padding: 1rem;
     border-radius: 8px;
     z-index: 999;
@@ -1264,21 +1266,21 @@ p.matchedOn {
   }
 
   ul.navBarUl.show {
-    display: flex; /* only show when toggled */
+    display: flex; 
   }
 
   ul.navBarUl li {
     padding: 10px 0;
     font-size: 18px;
-    color: #fafcff; /* white text on pink background */
+    color: #fafcff; 
   }
 
   ul.navBarUl a {
-    color: #fafcff; /* make sure links stay visible */
+    color: #fafcff; 
   }
 
   .menu-toggle {
-    display: block; /* show the hamburger on mobile */
+    display: block;
     color: #fafcff;
   }
   .roomiePicksIntro {
@@ -1485,10 +1487,6 @@ p.matchedOn {
     width: 100vw;
     margin-left: 0vw;
     padding: 10px 10px;
-  }
-
-  .profileSetupContainer form {
-
   }
 
   .hideOption {
