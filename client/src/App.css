@@ -991,10 +991,6 @@ button.slick-arrow.slick-prev::before {
   font-size: 18px;
 }
 
-.picksProfile {
-
-}
-
 /* Like button */
 
 .likeButton {
@@ -1072,10 +1068,9 @@ button.slick-arrow.slick-prev::before {
   justify-content: center;
   align-items: center;
   padding: 0px 0px;
-  border-radius: 0 20px 20px 0;
+  border-radius: 6px 30px 30px 6px;
   margin-bottom: 40px;
   
-  /* box-shadow: 0px 2px 14px 2px rgba(5, 24, 95, 0.2); */
 }
 
 .profilePicture {
@@ -1115,7 +1110,6 @@ button.slick-arrow.slick-prev::before {
 
 .row3 {
   display: grid;
-  /* width: 60%; */
   grid-template-columns: repeat(2, 1fr);
   gap: 0px !important;
   margin: 10px 0px;
@@ -1202,7 +1196,7 @@ h4.rent {
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
   font-weight: 500;
   padding: 0px 4px;
-  display: inline-block; /* so it only wraps the text */
+  display: inline-block; 
   clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
   height: fit-content;
 }
@@ -1242,8 +1236,8 @@ p.matchedOn {
 
 /* media queries */
 
-/* tablet */
-@media (max-width: 768px) {
+/* phone */
+@media (max-width: 1024px) {
   .menu-toggle {
     display: block;
   }
@@ -1329,5 +1323,182 @@ p.matchedOn {
     object-position: center center !important;
   }
 
+  .noMoreProfiles {
+    width: 80%;
+    margin-left: 10%;
+  }
+
+  .profileListing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px 20px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+
+  .profileCard {
+    border-radius: 10px;
+    width: 100%;
+    margin-left: 0%;
+    flex-direction: column;
+    padding: 20px 5px;
+
+  }
+
+  .profilePicture {
+    transform: none;
+    border: none;
+    width: 40%;
+  }
+
+  .profileInfo {
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px 10px;
+  }
+
+  .row1 {
+    flex-direction: column;
+    gap: 0px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .row2 p {
+    text-align: center;
+    margin: 10px 0px;
+  }
+
+  .matchSummaryContainer {
+    width: 76vw;
+    margin-left: 5vw;
+  }
+
+  .matchSummaryCard {
+    width: 76vw;
+  }
+
+  .matchSummaryCard h4 {
+    font-size: 16px;
+  }
+
+  .horizontalWrapper {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  h4.rent {
+    width: fit-content;
+    margin-bottom: 8px;
+  }
+
+  p.shortDesc {
+    width: 100%;
+    font-size: 14px;
+    display: none;
+  }
+
+  .matchOnly {
+    width: 90vw;
+    margin-left: 3vw;
+  }
+
+  .matchOnly .matchSummaryCard {
+    width: 90vw;
+  }
+
+  .bannerImg {
+    min-height: 95vh;
+    object-position: 30% 20%;
+  }
+
+  .bannerText {
+    width: 80%;
+  }
+  .bannerText h1 {
+    font-size: 3em;
+  }
+
+  .howItWorks {
+    height: 95vh;
+    width: 90vw;
+    margin-left: 5vw;
+    margin-top: 50px;
+  }
+
+  .howItWorks h3 {
+    margin-bottom: 20px;
+    margin-top: 0px;
+    display: none;
+  }
+
+  .howItWorksFlex {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stage1, .stage2, .stage3 {
+    width: 100%;
+    padding: 0px;
+  }
+  .stage1 img, .stage2 img, .stage3 img { 
+    width: 20%;
+    margin-left: 40%;
+
+  }
+
+  .howHeading {
+    font-size: 1.1rem !important;
+    padding-top: 10px;
+  }
+
+  p.nextSteps {
+    width: 100%;
+    margin-left: 0%;
+  }
+
+  .CTAContainer {
+    height: 90vh;
+  }
+
+  .CTA {
+    flex-direction: column;
+  }
+
+  .CTAOption {
+    width: 88%;
+  }
+
+  .get-started-container {
+    width: 70vw;
+  }
+
+  .stepHeading {
+    display: none;
+  }
+
+  .profileSetupContainer {
+    max-width: 100vw;
+    width: 100vw;
+    margin-left: 0vw;
+    padding: 10px 10px;
+  }
+
+  .profileSetupContainer form {
+
+  }
+
+  .hideOption {
+    margin-right: 20px;
+  }
+
+  .step4 {
+    width: 100%;
+  }
+
 }
+
 

@@ -19,7 +19,7 @@ function MatchSummaryContainer() {
         }, []);
 
     return (
-        <div className="matchSummaryContainer">
+        <div className="matchSummaryContainer matchOnly">
             {listings.map(listing => (
                 console.log('Link userId:', listing.userId, 'Listing object:', listing),
                 <Link
