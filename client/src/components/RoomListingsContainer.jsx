@@ -60,11 +60,13 @@ function RoomListingsContainer({ onChangeListing, showProfileButton }) {
         fetchListings();
     }, [currentUser, onChangeListing]);
 
+    // Update listing based on which mode we're in
     useEffect(() => {
-        if (listings[currentIndex] && onChangeListing) {
-            onChangeListing(listings[currentIndex]);
+        const activeIndex = isMobile ? currentSwipeIndex : currentIndex;
+        if (listings[activeIndex] && onChangeListing) {
+            onChangeListing(listings[activeIndex]);
         }
-    }, [currentIndex, listings, onChangeListing]);
+    }, [currentIndex, currentSwipeIndex, isMobile, listings, onChangeListing]);
 
     const handleYes = () => {
         const currentListing = listings[currentIndex];

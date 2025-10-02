@@ -4,7 +4,12 @@ import { useDrag } from "@use-gesture/react";
 import { useMediaQuery } from "react-responsive";
 import RoomListingCard from "./RoomListingCard";
 
-const to = (i) => ({ x: 0, y: i * -2, scale: 1, rot: 0 });
+const to = (i, total) => ({ 
+  x: 0, 
+  y: (total - 1 - i) * -2,
+  scale: 1, 
+  rot: 0 
+});
 const from = () => ({ x: 0, rot: 0, scale: 1, y: 0 });
 
 function SwipeStack({ listings, onLike, onDislike, onIndexChange }) {
@@ -14,15 +19,18 @@ function SwipeStack({ listings, onLike, onDislike, onIndexChange }) {
   const [springs, api] = useSprings(
     listings.length, 
     (i) => ({ 
-      ...to(i), 
+      ...to(i, listings.length), 
       immediate: true,
     }),
     [listings.length]
   );
 
   const currentCardIndex = useMemo(() => {
-    return listings.findIndex((_, i) => !gone.has(i));
-  }, [listings, gone]);
+    for (let i = 0; i < listings.length; i++) {
+      if (!gone.has(i)) return i;
+    }
+    return -1;
+  }, [listings.length, gone]);
 
   useEffect(() => {
     if (onIndexChange) {
@@ -122,6 +130,7 @@ function SwipeStack({ listings, onLike, onDislike, onIndexChange }) {
           style={{
             ...cardOuterStyle,
             transform: interpolate([x, y], (x, y) => `translate3d(${x}px,${y}px,0)`),
+            zIndex: listings.length - i, 
           }}
         >
           <animated.div
