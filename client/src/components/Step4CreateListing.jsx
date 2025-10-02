@@ -264,16 +264,16 @@ function Step4CreateListing({ listingType, onNext, onPrevious, defaultValues, us
           {listingType === 'hasRoom' ? (
             <>
               <div className="inlineRadios">
-                <label className='step4Label'>Does your home accept pets?<span className='required'>*</span></label>
+                <label className='step4Label'>Does your home accept pets?</label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('petsAccepted')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('petsAccepted')} /> No</label>
               </div>
               <div className="inlineRadios">
-                <label className='step4Label'>Is your home a women-only home?<span className='required'>*</span></label>
+                <label className='step4Label'>Is your home a women-only home?</label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('womenOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('womenOnlyHomeYN')} /> No</label>
               </div>
-              <div className="inlineRadios"><span className='required'>*</span>
+              <div className="inlineRadios">
                 <label className='step4Label'>Is your home a lgbtq+ only home?</label>
                 <label className='horizontal'><input type="radio" value="yes" {...register('lgbtqOnlyHomeYN')} /> Yes</label>
                 <label className='horizontal'><input type="radio" value="no" {...register('lgbtqOnlyHomeYN')} /> No</label>

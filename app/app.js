@@ -885,17 +885,17 @@ app.post('/api/profile-setup', async (req, res) => {
         WHERE user_id = ?`,
         [
           step2.workStatus || null,
-          step2.hideWorkStatus || null,
+          step2.hideWorkStatus ? 0 : 1,
           step2.student === 'yes' ? 1 : 0,
-          step2.hideStudent || null,
+          step2.hideStudent ? 0 : 1,
           step2.pets === 'yes' ? 1 : 0,
           step2.smokes === 'yes' ? 1 : 0,
           step2.pronouns || null,
-          step2.hidePronouns || null,
+          step2.hidePronouns ? 0 : 1,
           step2.lgbtq || null,
-          step2.hideLgbtq || null,
+          step2.hideLgbtq ? 0 : 1,
           step2.genderIdentity || null,
-          step2.hideGenderIdentity || null,
+          step2.hideGenderIdentity ? 0 : 1,
           userId
         ]
       );
@@ -911,17 +911,17 @@ app.post('/api/profile-setup', async (req, res) => {
           step1.bio || '',
           step1.profilePictureUrl || null,
           step2.workStatus || null,
-          step2.hideWorkStatus || null,
+          step2.hideWorkStatus ? 0 : 1,
           step2.student === 'yes' ? 1 : 0,
-          step2.hideStudent || null,
+          step2.hideStudent ? 0 : 1,
           step2.pets === 'yes' ? 1 : 0,
           step2.smokes === 'yes' ? 1 : 0,
           step2.pronouns || null,
-          step2.hidePronouns || null,
+          step2.hidePronouns ? 0 : 1,
           step2.lgbtq === 'yes' ? 1 : 0,
-          step2.hideLgbtq || null,
+          step2.hideLgbtq ? 0 : 1,
           step2.genderIdentity || null,
-          step2.hideGenderIdentity || null
+          step2.hideGenderIdentity ? 0 : 1,
         ]
       );
     }
